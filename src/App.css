@@ -1,0 +1,16 @@
+.app-container {
+  max-width: 500px;
+  margin: auto;
+}
+
+.app-container--orange {
+  max-width: none;
+  width: 100%;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
