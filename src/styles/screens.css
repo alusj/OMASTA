@@ -1,0 +1,1343 @@
+/* Screen-level composition: products, offers, status, find, support, account. */
+
+/* ---------- Reusing the original artwork on light surfaces ----------
+   The device motif and the outline button were both drawn for the original
+   dark hero card. These rules re-fit them for cards, detail pages and the
+   assistant's small result tiles without changing the original styles. */
+
+.omasta-product-card-art,
+.omasta-product-detail-art,
+.omasta-result-art {
+  position: relative;
+  overflow: hidden;
+}
+
+.omasta-product-card-art .orange-product-art,
+.omasta-product-detail-art .orange-product-art,
+.omasta-result-art .orange-product-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.omasta-product-card-art .orange-product-glow,
+.omasta-product-detail-art .orange-product-glow,
+.omasta-result-art .orange-product-glow {
+  top: 8%;
+  right: 6%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 153, 51, 0.22);
+}
+
+.omasta-product-card-art .orange-product-orbit,
+.omasta-product-detail-art .orange-product-orbit,
+.omasta-result-art .orange-product-orbit {
+  top: 42%;
+  right: -12%;
+  width: 190px;
+  height: 78px;
+  border-color: rgba(255, 153, 51, 0.32);
+}
+
+.omasta-product-card-art .orange-product-device,
+.omasta-product-detail-art .orange-product-device,
+.omasta-result-art .orange-product-device {
+  right: auto;
+  left: 50%;
+  border-width: 6px;
+  border-radius: 20px;
+  box-shadow: 10px 12px 0 rgba(0, 0, 0, 0.08), 0 16px 28px rgba(0, 0, 0, 0.14);
+}
+
+.omasta-product-card-art .orange-product-device {
+  width: 96px;
+  height: 124px;
+  transform: translate(-50%, -50%) rotate(10deg);
+}
+
+.omasta-product-card-art .orange-product-device-screen {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+.omasta-product-detail-art .orange-product-device {
+  width: 126px;
+  height: 162px;
+  transform: translate(-50%, -50%) rotate(10deg);
+}
+
+.omasta-product-detail-art .orange-product-device-screen {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+}
+
+.omasta-result-art .orange-product-device {
+  width: 44px;
+  height: 58px;
+  border-width: 3px;
+  border-radius: 11px;
+  transform: translate(-50%, -50%) rotate(10deg);
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.07);
+}
+
+.omasta-result-art .orange-product-device-screen {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.omasta-result-art .orange-product-device-screen svg {
+  width: 13px;
+  height: 13px;
+}
+
+.omasta-result-art .orange-product-device-light,
+.omasta-result-art .orange-product-device-line,
+.omasta-result-art .orange-product-orbit {
+  display: none;
+}
+
+/* Outline buttons on light surfaces. */
+.omasta-product-card .orange-button--outline,
+.omasta-product-detail-actions .orange-button--outline,
+.omasta-location-actions .orange-button--outline,
+.omasta-location-detail-actions .orange-button--outline,
+.omasta-confirm-actions .orange-button--outline,
+.omasta-topic-actions .orange-button--outline,
+.omasta-offer-actions .orange-button--outline {
+  border: 1px solid var(--orange-border);
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+}
+
+.omasta-product-card .orange-button--outline:hover,
+.omasta-product-detail-actions .orange-button--outline:hover,
+.omasta-location-actions .orange-button--outline:hover,
+.omasta-location-detail-actions .orange-button--outline:hover,
+.omasta-confirm-actions .orange-button--outline:hover,
+.omasta-topic-actions .orange-button--outline:hover,
+.omasta-offer-actions .orange-button--outline:hover {
+  border-color: var(--orange);
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+/* ---------- Products ---------- */
+
+.omasta-product-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+}
+
+.omasta-product-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-sm);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.omasta-product-card:hover {
+  border-color: #e0d9ce;
+  box-shadow: var(--omasta-shadow-md);
+  transform: translateY(-2px);
+}
+
+.omasta-product-card-art {
+  position: relative;
+  display: grid;
+  min-height: 148px;
+  place-items: center;
+  background: linear-gradient(160deg, #fff6ec, #fbf8f3);
+}
+
+.omasta-product-card-art .orange-product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+
+.omasta-product-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+}
+
+.omasta-product-card-body h3 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+}
+
+.omasta-product-card-copy {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.omasta-product-card-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.omasta-product-card-price span {
+  display: block;
+  color: var(--orange-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.omasta-product-card-price strong {
+  color: var(--orange-ink);
+  font-size: 1.02rem;
+}
+
+.omasta-product-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.omasta-product-card-actions .orange-button {
+  flex: 1;
+  justify-content: center;
+  padding: 10px 12px;
+  font-size: 0.76rem;
+}
+
+/* ---------- Featured carousel ---------- */
+
+.omasta-carousel-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.omasta-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.omasta-carousel-slide {
+  flex: 0 0 min(78%, 300px);
+  scroll-snap-align: start;
+}
+
+.omasta-carousel-slide .omasta-product-card {
+  height: 100%;
+}
+
+.omasta-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.omasta-carousel-controls > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+}
+
+.omasta-carousel-controls > button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (min-width: 900px) {
+  .omasta-carousel-slide {
+    flex-basis: 300px;
+  }
+}
+
+/* ---------- Quick actions ---------- */
+
+.omasta-quick-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.omasta-quick-tile {
+  display: grid;
+  gap: 5px;
+  justify-items: center;
+  padding: 15px 8px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-surface);
+  text-align: center;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.omasta-quick-tile:hover {
+  border-color: var(--orange);
+  box-shadow: var(--omasta-shadow-sm);
+  transform: translateY(-2px);
+}
+
+.omasta-quick-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-quick-tile strong {
+  color: var(--orange-ink);
+  font-size: 0.77rem;
+  line-height: 1.3;
+}
+
+.omasta-quick-tile small {
+  color: var(--orange-muted);
+  font-size: 0.65rem;
+}
+
+@media (max-width: 720px) {
+  .omasta-quick-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .omasta-quick-tile small {
+    display: none;
+  }
+}
+
+/* ---------- Find shortcuts ---------- */
+
+.omasta-find-shortcuts {
+  display: grid;
+  gap: 11px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.omasta-find-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-surface);
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.omasta-find-shortcut:hover {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+}
+
+.omasta-find-shortcut > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+
+.omasta-find-shortcut strong {
+  color: var(--orange-ink);
+  font-size: 0.85rem;
+}
+
+.omasta-find-shortcut small {
+  color: var(--orange-muted);
+  font-size: 0.71rem;
+}
+
+/* ---------- Offers ---------- */
+
+.omasta-offer-row {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.omasta-offer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+}
+
+.omasta-offer-card--data {
+  background: linear-gradient(150deg, #fff6ec, #ffffff 60%);
+}
+
+.omasta-offer-card--money {
+  background: linear-gradient(150deg, #f0f7f1, #ffffff 60%);
+}
+
+.omasta-offer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.omasta-offer-value {
+  padding: 5px 11px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--orange-ink);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.omasta-offer-card h3 {
+  margin: 4px 0 0;
+  color: var(--orange-ink);
+  font-size: 0.98rem;
+}
+
+.omasta-offer-card p {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.77rem;
+  line-height: 1.55;
+}
+
+.omasta-offer-price {
+  color: var(--orange-ink);
+  font-size: 1rem;
+}
+
+.omasta-offer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.omasta-offer-actions .orange-button {
+  padding: 10px 14px;
+  font-size: 0.76rem;
+}
+
+/* ---------- Service status ---------- */
+
+.omasta-status-panel {
+  padding: 16px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+}
+
+.omasta-status-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-status-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-sm);
+  background: var(--omasta-raised);
+}
+
+.omasta-status-item strong {
+  display: block;
+  color: var(--orange-ink);
+  font-size: 0.8rem;
+}
+
+.omasta-status-item small {
+  color: var(--orange-muted);
+  font-size: 0.68rem;
+}
+
+.omasta-status-item--operational svg {
+  color: var(--omasta-success);
+}
+
+.omasta-status-item--degraded svg {
+  color: var(--omasta-warning);
+}
+
+.omasta-status-item--down svg {
+  color: var(--omasta-danger);
+}
+
+.omasta-status-item--unknown svg {
+  color: var(--orange-muted);
+}
+
+.omasta-status-report {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-surface);
+  color: var(--orange-deep);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.omasta-status-report:hover {
+  border-color: var(--orange);
+}
+
+/* ---------- Assistant strip ---------- */
+
+.omasta-assistant-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+  padding: 18px;
+  border: 1px solid #f0ddc6;
+  border-radius: var(--omasta-radius-lg);
+  background: linear-gradient(120deg, #fff4e8, #ffffff 70%);
+}
+
+.omasta-assistant-strip-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--orange-ink);
+  color: #ffb066;
+}
+
+.omasta-assistant-strip strong {
+  display: block;
+  color: var(--orange-ink);
+  font-size: 0.9rem;
+}
+
+.omasta-assistant-strip p {
+  margin: 3px 0 0;
+  color: var(--orange-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.omasta-assistant-strip > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--orange-ink);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .omasta-assistant-strip {
+    flex-wrap: wrap;
+  }
+
+  .omasta-assistant-strip > button {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+}
+
+/* ---------- Find screen ---------- */
+
+.omasta-find-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.omasta-find-toolbar-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.omasta-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.omasta-toolbar-button:hover:not(:disabled) {
+  border-color: var(--orange);
+  color: var(--orange-deep);
+}
+
+.omasta-toolbar-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.omasta-location-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 13px 15px;
+  border: 1px solid #f0dfc0;
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-warning-soft);
+  color: #6f5424;
+}
+
+.omasta-location-warning svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--omasta-warning);
+}
+
+.omasta-location-warning strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.omasta-location-warning p {
+  margin: 3px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.omasta-area-picker {
+  margin-bottom: 8px;
+}
+
+.omasta-find-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.omasta-find-controls .omasta-chips {
+  flex: 1;
+  min-width: 220px;
+  margin-bottom: 14px;
+}
+
+.omasta-view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+}
+
+.omasta-view-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--omasta-radius-pill);
+  background: transparent;
+  color: var(--omasta-ink-soft);
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.omasta-view-toggle button.is-active {
+  background: var(--orange-ink);
+  color: #fff;
+}
+
+.omasta-map-note {
+  margin: 10px 0 0;
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.orange-map-legend-dot--support {
+  background: #3b6ea5;
+}
+
+.orange-live-user-marker {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #1f6feb;
+  box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.22);
+}
+
+.omasta-location-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+}
+
+.omasta-location-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-sm);
+}
+
+.omasta-location-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.omasta-location-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-location-icon--money {
+  background: #eef6ef;
+  color: #2f7d32;
+}
+
+.omasta-location-icon--support {
+  background: #eef2f8;
+  color: #3b6ea5;
+}
+
+.omasta-location-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.omasta-location-card-title p {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.omasta-location-card-title h3 {
+  margin: 3px 0 0;
+  color: var(--orange-ink);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.omasta-location-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.omasta-location-distance {
+  color: var(--orange-deep);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.omasta-location-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.omasta-location-state--open {
+  color: var(--omasta-success);
+}
+
+.omasta-location-state--closed {
+  color: var(--omasta-danger);
+}
+
+.omasta-location-state--unknown {
+  color: var(--orange-muted);
+}
+
+.omasta-location-address {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.77rem;
+}
+
+.omasta-location-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-location-services li {
+  padding: 4px 9px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-raised);
+  color: var(--omasta-ink-soft);
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.omasta-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.omasta-location-actions .orange-button {
+  padding: 9px 14px;
+  font-size: 0.74rem;
+}
+
+.omasta-location-actions .orange-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.omasta-location-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--orange-deep);
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.omasta-location-detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0 0 10px;
+  color: var(--omasta-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.omasta-location-detail-row svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--orange-deep);
+}
+
+.omasta-location-detail-services h3 {
+  margin: 16px 0 8px;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--orange-muted);
+}
+
+.omasta-location-detail-services ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-location-detail-services li {
+  padding: 6px 11px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-raised);
+  color: var(--omasta-ink-soft);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.omasta-location-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+/* ---------- Bundles ---------- */
+
+.omasta-bundle-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.omasta-bundle-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.omasta-bundle-card.is-highlighted {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.14);
+}
+
+.omasta-bundle-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.omasta-bundle-value strong {
+  color: var(--orange-ink);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.omasta-bundle-value span {
+  color: var(--orange-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.omasta-bundle-card > p {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.omasta-bundle-card ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-bundle-card li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--omasta-ink-soft);
+  font-size: 0.75rem;
+}
+
+.omasta-bundle-card li svg {
+  color: var(--omasta-success);
+}
+
+.omasta-bundle-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.omasta-bundle-price {
+  display: grid;
+  gap: 4px;
+}
+
+.omasta-bundle-price strong {
+  color: var(--orange-ink);
+  font-size: 1.05rem;
+}
+
+/* ---------- Product detail ---------- */
+
+.omasta-product-detail {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 20px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+}
+
+.omasta-product-detail-art {
+  position: relative;
+  display: grid;
+  min-height: 210px;
+  place-items: center;
+  border-radius: var(--omasta-radius-md);
+  background: linear-gradient(160deg, #fff4e6, #fbf8f3);
+}
+
+.omasta-product-detail-art .orange-product-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+}
+
+.omasta-product-detail-copy h1 {
+  margin: 4px 0 6px;
+  color: var(--orange-ink);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.omasta-product-detail-tagline {
+  margin: 0 0 10px;
+  color: var(--orange-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.omasta-product-detail-copy > p {
+  color: var(--orange-muted);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.omasta-product-detail-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-raised);
+}
+
+.omasta-product-detail-price span {
+  display: block;
+  color: var(--orange-muted);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.omasta-product-detail-price strong {
+  color: var(--orange-ink);
+  font-size: 1.35rem;
+}
+
+.omasta-product-detail-price small {
+  display: block;
+  color: var(--orange-muted);
+  font-size: 0.71rem;
+}
+
+.omasta-product-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.omasta-product-detail-panels {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.omasta-detail-panel {
+  padding: 18px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+}
+
+.omasta-detail-panel h2 {
+  margin: 0 0 12px;
+  color: var(--orange-ink);
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.omasta-detail-list {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-detail-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--omasta-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.omasta-detail-list svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--omasta-success);
+}
+
+.omasta-spec-list {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+
+.omasta-spec-list > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1efeb;
+}
+
+.omasta-spec-list dt {
+  color: var(--orange-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.omasta-spec-list dd {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 0.8rem;
+  font-weight: 650;
+  text-align: right;
+}
+
+@media (min-width: 860px) {
+  .omasta-product-detail {
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: center;
+  }
+}
+
+/* ---------- Support ---------- */
+
+.omasta-support-primary {
+  display: grid;
+  gap: 11px;
+  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.omasta-support-primary-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.omasta-support-primary-card:hover {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+}
+
+.omasta-support-primary-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-support-primary-card strong {
+  display: block;
+  color: var(--orange-ink);
+  font-size: 0.87rem;
+}
+
+.omasta-support-primary-card small {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+}
+
+.omasta-support-primary-card > svg:last-child {
+  margin-left: auto;
+  color: #b3ada4;
+}
+
+.omasta-topic-list {
+  display: grid;
+  gap: 10px;
+}
+
+.omasta-topic {
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  background: var(--omasta-surface);
+  overflow: hidden;
+}
+
+.omasta-topic.is-open {
+  border-color: #ecd9c2;
+}
+
+.omasta-topic-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.omasta-topic-head > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+
+.omasta-topic-head strong {
+  color: var(--orange-ink);
+  font-size: 0.87rem;
+}
+
+.omasta-topic-head small {
+  color: var(--orange-muted);
+  font-size: 0.73rem;
+}
+
+.omasta-topic-chevron {
+  margin-left: auto;
+  color: #b3ada4;
+  transition: transform 180ms ease;
+}
+
+.omasta-topic.is-open .omasta-topic-chevron {
+  transform: rotate(90deg);
+}
+
+.omasta-topic-body {
+  padding: 0 16px 18px;
+}
+
+.omasta-topic-body ol {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.omasta-topic-body li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--omasta-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.omasta-topic-body li svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--orange-deep);
+}
+
+.omasta-topic-escalation {
+  margin: 0 0 14px;
+  padding: 11px 13px;
+  border-radius: var(--omasta-radius-sm);
+  background: var(--omasta-raised);
+  color: var(--omasta-ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.omasta-topic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* ---------- Account ---------- */
+
+.orange-account-actions button span {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.orange-account-actions button small {
+  color: var(--orange-muted);
+  font-size: 0.71rem;
+}
+
+.orange-account-actions button strong {
+  color: var(--orange-ink);
+  font-size: 0.84rem;
+}

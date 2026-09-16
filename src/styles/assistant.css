@@ -1,0 +1,597 @@
+/* OMASTA AI: floating button, conversation panel, messages and result cards. */
+
+/* ---------- Floating button ---------- */
+
+.omasta-fab {
+  position: fixed;
+  right: 18px;
+  /* Sits clear of the bottom navigation on phones. */
+  bottom: calc(var(--omasta-nav-clearance) + 6px);
+  z-index: 55;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: var(--omasta-radius-pill);
+  background: linear-gradient(135deg, #ff8f1f, #ef6100);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 14px 34px rgba(210, 86, 0, 0.34);
+  opacity: 0;
+  transform: translateY(14px) scale(0.92);
+  transition: opacity 320ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+
+.omasta-fab.is-entered {
+  opacity: 1;
+  transform: none;
+}
+
+.omasta-fab:hover {
+  box-shadow: 0 18px 40px rgba(210, 86, 0, 0.42);
+  transform: translateY(-2px);
+}
+
+.omasta-fab svg {
+  position: relative;
+  z-index: 1;
+}
+
+.omasta-fab-label {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.omasta-fab-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: rgba(255, 141, 33, 0.38);
+  opacity: 0;
+}
+
+/* Pulses only until the assistant has been used once. */
+.omasta-fab.is-hinting.is-entered .omasta-fab-glow {
+  animation: omasta-pulse 2.8s ease-out infinite;
+}
+
+@keyframes omasta-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+}
+
+@media (max-width: 420px) {
+  .omasta-fab {
+    padding: 15px;
+  }
+
+  .omasta-fab-label {
+    display: none;
+  }
+}
+
+/* The bottom navigation is centred and up to 640px wide, so the button can
+   only drop level with it once the viewport is wide enough that the two
+   cannot meet. Below that it stays above the navigation. */
+@media (min-width: 1100px) {
+  .omasta-fab {
+    right: 26px;
+    bottom: 26px;
+  }
+}
+
+/* ---------- Panel ---------- */
+
+.omasta-assistant-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(16, 16, 16, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.omasta-assistant {
+  position: fixed;
+  z-index: 75;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-lg);
+}
+
+.omasta-assistant--sheet {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(92vh, 780px);
+  border-radius: 24px 24px 0 0;
+  animation: omasta-sheet-in 260ms ease both;
+}
+
+.omasta-assistant--panel {
+  right: 26px;
+  /* Clears the floating bottom navigation, which is centred and can reach
+     under the panel on mid-width desktops. */
+  bottom: calc(var(--omasta-nav-clearance) + 4px);
+  width: min(420px, calc(100vw - 52px));
+  height: min(620px, calc(100vh - 200px));
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-lg);
+  animation: omasta-panel-in 220ms ease both;
+}
+
+@keyframes omasta-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.omasta-assistant-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--orange-border);
+  background: linear-gradient(120deg, #fff6ec, #ffffff 65%);
+}
+
+.omasta-assistant-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--orange-ink);
+  color: #ffb066;
+}
+
+.omasta-assistant-identity {
+  display: grid;
+  gap: 2px;
+}
+
+.omasta-assistant-identity strong {
+  color: var(--orange-ink);
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+}
+
+.omasta-assistant-identity span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.omasta-assistant-online {
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: var(--omasta-success);
+}
+
+.omasta-assistant-header-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.omasta-assistant-header-actions button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+}
+
+.omasta-assistant-header-actions button:hover {
+  border-color: var(--orange);
+  color: var(--orange-deep);
+}
+
+.omasta-assistant-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--omasta-canvas);
+  scroll-behavior: smooth;
+}
+
+/* ---------- Messages ---------- */
+
+.omasta-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 100%;
+  animation: omasta-fade-up 220ms ease both;
+}
+
+.omasta-message--user {
+  align-items: flex-end;
+}
+
+.omasta-bubble {
+  max-width: 88%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--omasta-surface);
+  border: 1px solid var(--orange-border);
+  color: var(--orange-ink);
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.omasta-bubble p {
+  margin: 0;
+}
+
+.omasta-bubble time {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.62rem;
+}
+
+.omasta-message--assistant .omasta-bubble {
+  border-bottom-left-radius: 6px;
+}
+
+.omasta-message--user .omasta-bubble {
+  border: 0;
+  border-bottom-right-radius: 6px;
+  background: var(--orange-ink);
+  color: #fff;
+}
+
+.omasta-message.is-error .omasta-bubble {
+  border-color: #f1c9c5;
+  background: #fdf3f2;
+  color: #7c2a24;
+}
+
+.omasta-message-cards {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ---------- Action buttons ---------- */
+
+.omasta-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.omasta-card-action {
+  padding: 9px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  font-size: 0.75rem;
+  font-weight: 750;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.omasta-card-action:hover {
+  border-color: var(--orange);
+  color: var(--orange-deep);
+  transform: translateY(-1px);
+}
+
+.omasta-card-action--primary {
+  border-color: transparent;
+  background: var(--orange-ink);
+  color: #fff;
+}
+
+.omasta-card-action--primary:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ---------- Result cards ---------- */
+
+.omasta-result-card {
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+  padding: 13px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-md);
+  background: var(--omasta-surface);
+}
+
+.omasta-result-art {
+  display: grid;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--omasta-radius-sm);
+  background: linear-gradient(160deg, #fff4e6, #fbf8f3);
+}
+
+
+.omasta-result-body {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.omasta-result-body h4 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 0.87rem;
+  line-height: 1.3;
+}
+
+.omasta-result-subtitle {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.omasta-result-copy {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.omasta-result-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.omasta-result-price strong {
+  color: var(--orange-ink);
+  font-size: 0.92rem;
+}
+
+.omasta-result-location-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.omasta-result-pin {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-result-pin--support {
+  background: #eef2f8;
+  color: #3b6ea5;
+}
+
+.omasta-result-location-head .omasta-demo-badge {
+  margin-left: auto;
+}
+
+.omasta-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  color: var(--orange-deep);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.omasta-result-bundle-value {
+  display: grid;
+  gap: 2px;
+  min-width: 78px;
+  padding: 10px 12px;
+  border-radius: var(--omasta-radius-sm);
+  background: var(--orange-soft);
+  text-align: center;
+}
+
+.omasta-result-bundle-value strong {
+  color: var(--orange-ink);
+  font-size: 1.12rem;
+}
+
+.omasta-result-bundle-value span {
+  color: var(--orange-deep);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.omasta-result-steps {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-left: 18px;
+  color: var(--omasta-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* ---------- Suggestions, typing, composer ---------- */
+
+.omasta-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.omasta-suggestions button {
+  padding: 8px 13px;
+  border: 1px dashed #e0d9cd;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+  font-size: 0.73rem;
+  font-weight: 650;
+  text-align: left;
+}
+
+.omasta-suggestions button:hover {
+  border-style: solid;
+  border-color: var(--orange);
+  color: var(--orange-deep);
+}
+
+.omasta-assistant-intro-prompts {
+  padding: 0 16px 10px;
+  background: var(--omasta-canvas);
+}
+
+.omasta-typing {
+  display: inline-flex;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 12px 15px;
+  border: 1px solid var(--orange-border);
+  border-radius: 16px 16px 16px 6px;
+  background: var(--omasta-surface);
+}
+
+.omasta-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c3bcb1;
+  animation: omasta-typing 1.1s ease-in-out infinite;
+}
+
+.omasta-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.omasta-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes omasta-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.omasta-assistant-footer {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--orange-border);
+  background: var(--omasta-surface);
+}
+
+.omasta-composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-canvas);
+}
+
+.omasta-composer:focus-within {
+  border-color: var(--orange);
+}
+
+.omasta-composer input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--orange-ink);
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.omasta-composer-mic,
+.omasta-composer-send {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+}
+
+.omasta-composer-send {
+  background: var(--orange-ink);
+  color: #fff;
+}
+
+.omasta-composer-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.omasta-assistant-disclaimer {
+  margin: 10px 2px 0;
+  color: var(--orange-muted);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .omasta-fab,
+  .omasta-fab-glow,
+  .omasta-typing span,
+  .omasta-assistant--sheet,
+  .omasta-assistant--panel,
+  .omasta-message,
+  .omasta-route-transition,
+  .omasta-skeleton {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

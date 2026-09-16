@@ -1,0 +1,39 @@
+/**
+ * Design tokens.
+ *
+ * The original palette lived on `.orange-app` only, which put it out of reach
+ * of anything rendered outside that subtree. It is declared here as well so
+ * every component shares one source of truth.
+ */
+
+:root {
+  --orange: #ff7900;
+  --orange-deep: #e85d00;
+  --orange-soft: #fff1e5;
+  --orange-ink: #161616;
+  --orange-muted: #747474;
+  --orange-border: #e9e7e3;
+
+  --omasta-surface: #ffffff;
+  --omasta-canvas: #f7f7f5;
+  --omasta-raised: #fbfaf8;
+  --omasta-ink-soft: #4d4d4d;
+
+  --omasta-success: #2f7d32;
+  --omasta-success-soft: #eef7ed;
+  --omasta-warning: #9a6200;
+  --omasta-warning-soft: #fff4e0;
+  --omasta-danger: #b3261e;
+
+  --omasta-radius-sm: 12px;
+  --omasta-radius-md: 16px;
+  --omasta-radius-lg: 22px;
+  --omasta-radius-pill: 999px;
+
+  --omasta-shadow-sm: 0 2px 8px rgba(24, 20, 16, 0.05);
+  --omasta-shadow-md: 0 10px 28px rgba(24, 20, 16, 0.09);
+  --omasta-shadow-lg: 0 24px 60px rgba(24, 20, 16, 0.16);
+
+  /* Bottom nav height plus its offset, used to keep overlays clear of it. */
+  --omasta-nav-clearance: 96px;
+}
