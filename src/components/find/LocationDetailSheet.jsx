@@ -1,4 +1,4 @@
-import { Clock3, MapPin, Navigation, Phone, Sparkles } from "lucide-react";
+import { Clock3, MapPin, Navigation, Phone, Route, Sparkles } from "lucide-react";
 
 import BottomSheet from "../common/BottomSheet.jsx";
 import { DemoNote } from "../common/DemoBadge.jsx";
@@ -51,6 +51,10 @@ export default function LocationDetailSheet({ location, open, onClose, onDirecti
           </div>
         ) : null}
 
+        {location.isCommunity ? (
+          <DemoNote>Added by a customer and approved by an Orange admin. Hours and services are not listed yet.</DemoNote>
+        ) : null}
+
         {location.isDemo ? (
           <DemoNote>
             This is a sample record used during development. Details, hours and availability are not verified Orange
@@ -60,8 +64,8 @@ export default function LocationDetailSheet({ location, open, onClose, onDirecti
 
         <div className="omasta-location-detail-actions">
           <button type="button" className="orange-button orange-button--solid" onClick={() => onDirections(location)}>
-            <Navigation size={15} />
-            Directions
+            <Route size={15} />
+            Show route
           </button>
           <button
             type="button"

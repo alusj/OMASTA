@@ -1,0 +1,1141 @@
+/* Find Orange: full-screen map, floating controls, route card, drop-a-pin,
+   list view tools, "Add location" form and the /admin review screen. */
+
+:root {
+  /* Sticky app header height (80px + border); overlays sit just below it. */
+  --omasta-header-h: 81px;
+}
+
+@media (max-width: 620px) {
+  :root {
+    --omasta-header-h: 71px;
+  }
+}
+
+/* ---------- Full-screen map stage ---------- */
+
+body.omasta-map-mode {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* The route fade-in uses a transform, which would anchor the fixed map to the
+   page instead of the viewport while it runs. */
+.omasta-route-transition:has(.omasta-find-stage) {
+  animation: none;
+}
+
+.omasta-find-stage {
+  position: fixed;
+  z-index: 5;
+  inset: 0;
+  overflow: hidden;
+  background: #dce8db;
+}
+
+.orange-map-live.orange-map-live--fullscreen {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Zoom + locate controls: right edge, vertically centred, clear of the
+   floating buttons above and the card below. */
+.omasta-find-stage .orange-map-live .maplibregl-ctrl-top-right {
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+}
+
+.omasta-find-stage .orange-map-live .maplibregl-ctrl-group button {
+  width: 38px;
+  height: 38px;
+}
+
+/* Phones: pinch zooms, so only the locate button stays, tucked under the
+   category bar where the route card can never cover it. */
+@media (max-width: 719px) {
+  .omasta-find-stage .orange-map-live .maplibregl-ctrl-top-right {
+    top: calc(var(--omasta-header-h) + 118px);
+    transform: none;
+  }
+
+  .omasta-find-stage .maplibregl-ctrl-group:has(.maplibregl-ctrl-zoom-in) {
+    display: none;
+  }
+}
+
+.omasta-find-stage .maplibregl-ctrl-bottom-left,
+.omasta-find-stage .maplibregl-ctrl-bottom-right {
+  bottom: calc(var(--omasta-nav-clearance) + env(safe-area-inset-bottom, 0px));
+}
+
+.omasta-find-fallback {
+  position: absolute;
+  inset: 0;
+}
+
+.omasta-find-fallback .orange-map {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+
+.omasta-find-fallback .omasta-map-note {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--omasta-header-h) + 118px);
+  left: 50%;
+  max-width: calc(100% - 28px);
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ---------- Floating top controls ---------- */
+
+.omasta-find-overlay-top {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--omasta-header-h) + 10px);
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+.omasta-find-overlay-top > * {
+  pointer-events: auto;
+}
+
+.omasta-find-view-toggle.is-floating {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: var(--omasta-shadow-md);
+}
+
+.omasta-find-view-toggle button {
+  min-height: 36px;
+}
+
+.omasta-map-categories {
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  align-items: center;
+  gap: 8px;
+}
+
+.omasta-map-chip-scroll {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Soft fade on the right edge hints that more categories scroll in. */
+  mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
+}
+
+.omasta-map-chip-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.omasta-map-categories > .omasta-map-chip--add {
+  margin-bottom: 6px;
+}
+
+@media (min-width: 720px) {
+  .omasta-map-categories {
+    width: auto;
+  }
+
+  .omasta-map-chip-scroll {
+    mask-image: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .orange-app .omasta-map-chip {
+    padding: 0 12px;
+    font-size: 0.74rem;
+  }
+}
+
+.orange-app .omasta-map-chip {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid rgba(224, 222, 217, 0.95);
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 6px 16px rgba(34, 29, 24, 0.14);
+  color: var(--orange-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.orange-app .omasta-map-chip:hover {
+  transform: translateY(-1px);
+}
+
+.orange-app .omasta-map-chip.is-active {
+  border-color: var(--orange-ink);
+  background: var(--orange-ink);
+  color: #fff;
+}
+
+.omasta-map-chip.is-busy svg {
+  animation: omasta-chip-busy 900ms ease-in-out infinite;
+}
+
+@keyframes omasta-chip-busy {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.orange-app .omasta-map-chip--add {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+}
+
+.orange-app .omasta-map-chip--add:hover {
+  background: var(--orange-deep);
+}
+
+.omasta-find-areas {
+  width: min(100%, 560px);
+  margin: 0;
+  padding: 10px 12px 4px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: var(--omasta-shadow-md);
+}
+
+.omasta-find-areas .omasta-chips {
+  margin: 6px 0;
+}
+
+/* ---------- Markers ---------- */
+
+.orange-live-marker--support .orange-live-marker-pin {
+  background: #3b6ea5;
+}
+
+.orange-live-marker--preview .orange-live-marker-pin {
+  background: var(--orange-ink);
+}
+
+.orange-live-marker.is-community .orange-live-marker-pin {
+  border-color: #ffe2c6;
+}
+
+.orange-live-marker.is-selected .orange-live-marker-pin {
+  width: 42px;
+  height: 42px;
+  animation: omasta-marker-pulse 1.8s ease-out infinite;
+}
+
+.orange-live-marker.is-selected small {
+  border-color: var(--orange-ink);
+  background: var(--orange-ink);
+  color: #fff;
+  font-size: 0.64rem;
+}
+
+@keyframes omasta-marker-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 121, 0, 0.45), 0 8px 15px rgba(37, 38, 29, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(255, 121, 0, 0), 0 8px 15px rgba(37, 38, 29, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 121, 0, 0), 0 8px 15px rgba(37, 38, 29, 0.2);
+  }
+}
+
+/* ---------- Bottom card (route / pin) ---------- */
+
+.omasta-route-card,
+.omasta-pin-panel {
+  position: absolute;
+  z-index: 4;
+  right: 12px;
+  bottom: calc(var(--omasta-nav-clearance) + 10px + env(safe-area-inset-bottom, 0px));
+  left: 12px;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--orange-border);
+  border-radius: 22px;
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-lg);
+  animation: omasta-card-rise 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes omasta-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (min-width: 720px) {
+  .omasta-route-card,
+  .omasta-pin-panel {
+    right: auto;
+    left: 24px;
+    width: 380px;
+    bottom: calc(var(--omasta-nav-clearance) + 14px);
+  }
+}
+
+.omasta-route-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.omasta-route-card-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.omasta-route-card-title p {
+  margin: 0 0 2px;
+  overflow: hidden;
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.omasta-route-card-title h2 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 0.98rem;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.orange-app .omasta-route-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+}
+
+.omasta-route-address {
+  margin: 6px 0 10px 50px;
+  color: var(--orange-muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.omasta-route-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--orange-soft);
+  color: #7a3a00;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.omasta-route-summary svg {
+  flex: 0 0 auto;
+}
+
+.omasta-route-summary strong {
+  color: var(--orange-ink);
+}
+
+.omasta-route-summary.is-loading {
+  background: #f4f2ef;
+  color: var(--orange-muted);
+}
+
+.omasta-route-summary.is-straight {
+  background: var(--omasta-warning-soft);
+  color: var(--omasta-warning);
+}
+
+.orange-app .omasta-route-locate {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  border: 1px dashed var(--orange);
+  border-radius: 14px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.omasta-route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.omasta-route-actions .omasta-ask-ai-button {
+  min-height: 42px;
+}
+
+/* Outline buttons on light surfaces (the base style was drawn for dark cards). */
+.omasta-route-actions .orange-button--outline,
+.omasta-pin-actions .orange-button--outline,
+.omasta-admin-actions .orange-button--outline,
+.omasta-admin-denied .orange-button--outline {
+  border-color: var(--orange-border);
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+}
+
+.omasta-route-actions .orange-button--outline:hover,
+.omasta-pin-actions .orange-button--outline:hover,
+.omasta-admin-actions .orange-button--outline:hover,
+.omasta-admin-denied .orange-button--outline:hover {
+  border-color: var(--orange);
+  background: var(--omasta-surface);
+}
+
+.omasta-route-actions .orange-button:disabled,
+.omasta-pin-actions .orange-button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.omasta-map-sample-note {
+  margin: -4px 0 0;
+  padding: 4px 10px;
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--omasta-shadow-sm);
+  color: #6d6455;
+  font-size: 0.66rem;
+  font-weight: 650;
+}
+
+/* ---------- Drop a pin ---------- */
+
+.omasta-pin-target {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  color: var(--orange);
+  pointer-events: none;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.25));
+  /* The icon's tip sits ~3px above its box bottom: that tip is the point. */
+  transform: translate(-50%, calc(-100% + 3px));
+  animation: omasta-pin-drop 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.omasta-pin-target svg {
+  display: block;
+  fill: #fff;
+}
+
+.omasta-pin-shadow {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 12px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  transform: translateX(-50%);
+}
+
+@keyframes omasta-pin-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 24px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% + 3px));
+  }
+}
+
+.omasta-pin-hint {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--omasta-header-h) + 12px);
+  left: 50%;
+  max-width: calc(100% - 28px);
+  overflow: hidden;
+  padding: 10px 16px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--orange-ink);
+  box-shadow: var(--omasta-shadow-md);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.omasta-pin-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.omasta-pin-panel p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.omasta-pin-panel p span {
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.omasta-pin-panel p strong {
+  color: var(--orange-ink);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.omasta-pin-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.omasta-pin-actions .orange-button {
+  min-height: 46px;
+}
+
+/* ---------- List view ---------- */
+
+.omasta-find-list-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.omasta-find-list-head .orange-page-intro {
+  margin-bottom: 0;
+}
+
+.omasta-find-list-head .omasta-find-view-toggle {
+  margin-bottom: 4px;
+}
+
+.omasta-find-list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 12px;
+}
+
+.omasta-find-list-toolbar .orange-button {
+  min-height: 44px;
+  font-size: 0.8rem;
+}
+
+.omasta-sort {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px 0 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+}
+
+.omasta-sort:focus-within {
+  border-color: var(--orange);
+}
+
+.omasta-sort select {
+  min-height: 40px;
+  padding: 0 6px 0 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--orange-ink);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.omasta-find-origin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--orange-border);
+  border-radius: 16px;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.omasta-find-origin > svg {
+  flex: 0 0 auto;
+  color: var(--orange-deep);
+}
+
+.omasta-find-origin span {
+  min-width: 150px;
+  flex: 1;
+}
+
+.orange-app .omasta-find-origin button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-surface);
+  color: var(--orange-deep);
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.omasta-find--list .omasta-find-areas {
+  width: 100%;
+  max-width: none;
+  margin-top: 10px;
+  box-shadow: none;
+  border: 1px solid var(--orange-border);
+}
+
+.omasta-find--list .omasta-chips {
+  margin-top: 14px;
+}
+
+/* Whole-card tap target that opens the route; buttons stay on top of it. */
+.omasta-location-card.is-selectable {
+  position: relative;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.omasta-location-card.is-selectable:hover {
+  border-color: #e7c9a8;
+  box-shadow: var(--omasta-shadow-md);
+}
+
+.orange-app .omasta-location-select {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.omasta-location-select::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: "";
+}
+
+.omasta-location-select:focus-visible {
+  outline: none;
+}
+
+.omasta-location-card:has(.omasta-location-select:focus-visible) {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.omasta-location-card.is-selectable .omasta-location-actions,
+.omasta-location-card.is-selectable .omasta-demo-badge,
+.omasta-location-card.is-selectable .omasta-community-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.omasta-community-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid #cfe3cf;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-success-soft);
+  color: var(--omasta-success);
+  font-size: 0.62rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+/* ---------- Your submissions ---------- */
+
+.omasta-my-submissions {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+}
+
+.omasta-my-submissions h2 {
+  margin: 0 0 6px;
+  color: var(--orange-ink);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.omasta-my-submissions ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-my-submissions li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 0;
+}
+
+.omasta-my-submissions li + li {
+  border-top: 1px solid #f0eeea;
+}
+
+.omasta-my-submissions li > div {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 160px;
+  gap: 2px;
+}
+
+.omasta-my-submissions strong {
+  font-size: 0.82rem;
+}
+
+.omasta-my-submissions small {
+  overflow: hidden;
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.omasta-submission-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-warning-soft);
+  color: var(--omasta-warning);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.omasta-my-submissions li.is-approved .omasta-submission-status {
+  background: var(--omasta-success-soft);
+  color: var(--omasta-success);
+}
+
+.omasta-my-submissions li.is-device .omasta-submission-status {
+  background: #f4f2ef;
+  color: var(--omasta-ink-soft);
+}
+
+.orange-app .omasta-my-submissions li > button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #aaa6a0;
+}
+
+/* ---------- Add location form ---------- */
+
+.omasta-add-form {
+  display: grid;
+  gap: 16px;
+}
+
+.omasta-add-categories {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.omasta-add-categories legend,
+.omasta-add-form .omasta-field > label > span {
+  display: block;
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--omasta-ink-soft);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.omasta-add-category-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.orange-app .omasta-add-category-options button {
+  min-height: 44px;
+  padding: 4px;
+  border: 1px solid var(--orange-border);
+  border-radius: 12px;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+  font-size: 0.74rem;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.orange-app .omasta-add-category-options button.is-active {
+  border-color: var(--orange);
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-address-input {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--orange-border);
+  border-radius: 14px;
+  background: var(--omasta-surface);
+  color: var(--orange-deep);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.omasta-address-input:focus-within {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.14);
+}
+
+.orange-app .omasta-address-input input {
+  min-width: 0;
+  min-height: 44px;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.omasta-capture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.orange-app .omasta-capture-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid #f0d8bd;
+  border-radius: 12px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+  font-size: 0.78rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.orange-app .omasta-capture-button:hover:not(:disabled) {
+  border-color: var(--orange);
+}
+
+.omasta-capture-button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.omasta-capture-recommended {
+  padding: 4px 8px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-success-soft);
+  color: var(--omasta-success);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.omasta-add-form small.omasta-captured {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--omasta-success);
+  font-weight: 650;
+}
+
+.omasta-add-form .omasta-field > small {
+  margin-top: 6px;
+  line-height: 1.45;
+}
+
+.orange-app .omasta-field textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 14px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  resize: vertical;
+}
+
+.orange-app .omasta-field textarea:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.14);
+}
+
+.omasta-add-submit {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.84rem;
+}
+
+.omasta-add-result {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.omasta-add-result-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 4px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--omasta-success-soft);
+  color: var(--omasta-success);
+}
+
+.omasta-add-result h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.omasta-add-result p {
+  margin: 0;
+  color: var(--omasta-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.omasta-add-result .omasta-demo-note {
+  text-align: left;
+}
+
+@media (max-width: 360px) {
+  .omasta-capture-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .omasta-capture-recommended {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+}
+
+/* ---------- /admin ---------- */
+
+.omasta-admin-signin {
+  display: grid;
+  max-width: 420px;
+  gap: 14px;
+}
+
+.omasta-admin-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--orange-muted);
+  font-size: 0.82rem;
+}
+
+.omasta-admin-denied {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  font-size: 0.84rem;
+}
+
+.omasta-admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.omasta-admin-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--orange-muted);
+  font-size: 0.74rem;
+}
+
+.orange-app .omasta-admin-user button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  color: var(--omasta-ink-soft);
+}
+
+.omasta-admin-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.omasta-admin-row {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+}
+
+.omasta-admin-row-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.omasta-admin-row-head p {
+  margin: 0 0 2px;
+  color: var(--orange-deep);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.omasta-admin-row-head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.omasta-admin-row-head time {
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.omasta-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.omasta-admin-actions .orange-button {
+  text-decoration: none;
+}
+
+.orange-app .omasta-admin-note {
+  min-height: 42px;
+  flex: 1 1 220px;
+  padding: 0 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  font-size: 0.9rem;
+}
+
+.omasta-admin-actions .omasta-admin-reject {
+  color: var(--omasta-danger);
+}
+
+.orange-app .omasta-admin-link {
+  display: block;
+  margin: 18px auto 0;
+  padding: 8px;
+  border: 0;
+  background: none;
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orange-live-marker.is-selected .orange-live-marker-pin,
+  .omasta-route-card,
+  .omasta-pin-panel,
+  .omasta-pin-target {
+    animation: none;
+  }
+}

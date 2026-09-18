@@ -1,7 +1,8 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { ChevronRight, Locate, MapPin, Navigation, Store, Wallet } from "lucide-react";
 
-import { buildDirectionsUrl, listLocations } from "../../services/locations/locationService.js";
+import { buildRoutePath, listLocations } from "../../services/locations/locationService.js";
 
 const SHORTCUTS = [
   { id: "agent", label: "Agent", icon: MapPin },
@@ -47,15 +48,10 @@ export default function AroundYouPreview({ coordinates, isLocating, onOpenCatego
             <strong>{nearest.name}</strong>
             <span>{nearest.distanceLabel}</span>
           </div>
-          <a
-            className="omasta-around-directions"
-            href={buildDirectionsUrl(nearest)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Directions
+          <Link className="omasta-around-directions" to={buildRoutePath(nearest)}>
+            Route
             <ChevronRight size={15} />
-          </a>
+          </Link>
         </div>
       ) : (
         <button type="button" className="omasta-around-locate" onClick={onRequestLocation} disabled={isLocating}>

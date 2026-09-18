@@ -69,7 +69,7 @@ export function locationCard(location) {
     isDemo: location.isDemo,
     actions: [
       createActionButton({
-        label: "Directions",
+        label: "Show route",
         variant: "primary",
         action: createAction(ActionType.DIRECTIONS, { locationId: location.id }),
       }),

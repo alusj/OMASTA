@@ -11,7 +11,7 @@
  */
 
 import { ActionType, requiresConfirmation } from "./assistantTypes.js";
-import { buildDirectionsUrl, findLocation } from "../locations/locationService.js";
+import { buildRoutePath, findLocation } from "../locations/locationService.js";
 
 export const DispatchStatus = {
   DONE: "done",
@@ -112,7 +112,9 @@ export function createActionDispatcher(handlers) {
           return { status: DispatchStatus.FAILED };
         }
 
-        window.open(buildDirectionsUrl(location), "_blank", "noopener,noreferrer");
+        // In-app route on the Find map; the customer never leaves OMASTA.
+        navigate(buildRoutePath(location));
+        closeAssistant?.({ soft: true });
         return { status: DispatchStatus.DONE };
       }
 

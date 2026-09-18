@@ -31,3 +31,20 @@ export const SUPPORT_PHONE = env.VITE_SUPPORT_PHONE || "";
 
 /** Global flag: no verified Orange backend is connected yet. */
 export const USING_DEMO_DATA = true;
+
+/**
+ * Supabase (public project URL + anon key only). The anon key is designed to
+ * be public; row-level security in `supabase/migrations` is what protects the
+ * data. Never put a service-role key in a VITE_ variable.
+ */
+export const SUPABASE_URL = env.VITE_SUPABASE_URL || "";
+export const SUPABASE_ANON_KEY = env.VITE_SUPABASE_ANON_KEY || "";
+export const hasSupabase = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+/**
+ * Road routing (OSRM-compatible). Defaults to the free public OSRM demo
+ * server, which is fine for a prototype but has no uptime guarantee and a
+ * fair-use policy. Point this at your own OSRM (or compatible) server for
+ * production. When it fails, Find falls back to a straight-line guide.
+ */
+export const ROUTING_URL = (env.VITE_ROUTING_URL || "https://router.project-osrm.org").replace(/\/$/, "");

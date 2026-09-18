@@ -20,6 +20,13 @@ export default function BottomSheet({
   labelledById,
 }) {
   const panelRef = useRef(null);
+  // Read through a ref so a parent passing a new function each render does not
+  // re-run the effect below and pull focus out of a field being typed in.
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) {
@@ -28,7 +35,7 @@ export default function BottomSheet({
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
       }
     };
 
@@ -41,7 +48,7 @@ export default function BottomSheet({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [onClose, open]);
+  }, [open]);
 
   if (!open) {
     return null;

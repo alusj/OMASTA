@@ -88,6 +88,10 @@ export default function AccountScreen() {
       <button type="button" className="omasta-secondary-link" onClick={() => navigate("/find?category=shop")}>
         Find an Orange shop
       </button>
+
+      <button type="button" className="omasta-admin-link" onClick={() => navigate("/admin")}>
+        Orange admin: review suggested locations
+      </button>
     </section>
   );
 }

@@ -14,8 +14,8 @@ export const LOCATION_CATEGORIES = [
   { id: "all", label: "All", plural: "locations" },
   { id: "agent", label: "Agents", plural: "agents" },
   { id: "shop", label: "Shops", plural: "shops" },
-  { id: "money", label: "Orange Money", plural: "Orange Money points" },
-  { id: "support", label: "Support", plural: "support centres" },
+  { id: "support", label: "Offices", plural: "Orange offices" },
+  { id: "money", label: "Money", plural: "Orange Money points" },
 ];
 
 /** Accepts plural/loose category names coming from assistant actions or URLs. */
@@ -28,6 +28,7 @@ export const CATEGORY_ALIASES = {
   store: "shop",
   stores: "shop",
   money: "money",
+  "money-point": "money",
   "orange-money": "money",
   "orange money": "money",
   cash: "money",
@@ -37,6 +38,8 @@ export const CATEGORY_ALIASES = {
   "service-centre": "support",
   "service-center": "support",
   care: "support",
+  office: "support",
+  offices: "support",
 };
 
 /** Areas offered when a customer declines or cannot share device location. */
@@ -116,8 +119,8 @@ export const LOCATIONS = [
   },
   {
     id: "demo-support-congo-cross",
-    name: "Sample Service Centre, Congo Cross",
-    type: "Service centre",
+    name: "Sample Orange Office, Congo Cross",
+    type: "Orange office",
     category: "support",
     address: "Congo Cross area, Freetown",
     coordinates: [-13.2662, 8.4724],
@@ -155,8 +158,8 @@ export const LOCATIONS = [
   },
   {
     id: "demo-support-waterloo",
-    name: "Sample Service Point, Waterloo",
-    type: "Service centre",
+    name: "Sample Orange Office, Waterloo",
+    type: "Orange office",
     category: "support",
     address: "Waterloo, Western Area Rural",
     coordinates: [-13.0722, 8.3386],

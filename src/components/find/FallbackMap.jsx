@@ -31,7 +31,7 @@ export default function FallbackMap({ locations, onSelect }) {
       <span className="orange-map-label orange-map-label--freetown">Freetown</span>
       <span className="orange-map-label orange-map-label--water">Atlantic Ocean</span>
 
-      {locations.map((location) => {
+      {locations.filter((location) => location.mapPosition).map((location) => {
         const Icon = CATEGORY_ICON[location.category] || MapPin;
 
         return (

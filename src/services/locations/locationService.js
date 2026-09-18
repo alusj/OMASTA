@@ -86,11 +86,14 @@ export function getOpenState(location, now = new Date()) {
 /**
  * Returns locations for a category, decorated with distance when a reference
  * point is known, sorted nearest first.
+ *
+ * `extra` adds records from other sources (approved community submissions)
+ * in the same shape, so every caller treats them identically.
  */
-export function listLocations({ category = "all", origin = null, limit = null } = {}) {
+export function listLocations({ category = "all", origin = null, limit = null, extra = [] } = {}) {
   const normalized = normalizeCategory(category);
 
-  const decorated = LOCATIONS.filter((location) => normalized === "all" || location.category === normalized).map(
+  const decorated = [...LOCATIONS, ...extra].filter((location) => normalized === "all" || location.category === normalized).map(
     (location) => {
       const km = origin ? distanceKm(origin, location.coordinates) : null;
 
@@ -182,8 +185,14 @@ export function requestDeviceLocation({ timeout = 10000 } = {}) {
   });
 }
 
-/** Opens a directions route in the platform map application. */
-export function buildDirectionsUrl(location) {
-  const [lng, lat] = location.coordinates;
-  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+/**
+ * In-app directions: opens Find on the map with this location selected and a
+ * route drawn from the customer. No hand-off to an external maps app.
+ */
+export function buildRoutePath(location) {
+  const params = new URLSearchParams({ view: "map", location: location.id, route: "1" });
+  return `/find?${params.toString()}`;
 }
+
+/** Where the map opens, and the reference point when no location is known. */
+export const DEFAULT_MAP_CENTER = [-13.2317, 8.484];

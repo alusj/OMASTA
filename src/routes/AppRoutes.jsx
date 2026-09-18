@@ -9,6 +9,7 @@ import SupportScreen from "../screens/SupportScreen.jsx";
 import AccountScreen from "../screens/AccountScreen.jsx";
 import ServicesScreen from "../screens/ServicesScreen.jsx";
 import ActivityScreen from "../screens/ActivityScreen.jsx";
+import AdminScreen from "../screens/AdminScreen.jsx";
 
 /**
  * Screens are real routes rather than local tab state, so the assistant, the
@@ -26,6 +27,7 @@ export default function AppRoutes() {
         <Route path="/account" element={<AccountScreen />} />
         <Route path="/services" element={<ServicesScreen />} />
         <Route path="/activity" element={<ActivityScreen />} />
+        <Route path="/admin" element={<AdminScreen />} />
       </Route>
       <Route path="/" element={<Navigate to="/orange" replace />} />
       <Route path="*" element={<Navigate to="/orange" replace />} />
