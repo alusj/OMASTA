@@ -4,9 +4,9 @@ import { ArrowLeft, Check, MapPin, Sparkles } from "lucide-react";
 
 import BottomSheet from "../components/common/BottomSheet.jsx";
 import DemoBadge, { DemoNote } from "../components/common/DemoBadge.jsx";
-import ProductArt from "../components/products/ProductArt.jsx";
+import ProductGallery from "../components/products/ProductGallery.jsx";
 import { SkeletonList } from "../components/common/Skeleton.jsx";
-import { getProduct } from "../services/catalog/catalogService.js";
+import { getProduct, getProductImages } from "../services/catalog/catalogService.js";
 import { useAppUi } from "../context/AppUiProvider.jsx";
 import { useAssistant } from "../context/AssistantProvider.jsx";
 import { useAssistantScreenContext } from "../hooks/useAssistantScreenContext.js";
@@ -83,10 +83,7 @@ export default function ProductDetailScreen() {
       </button>
 
       <article className="omasta-product-detail">
-        <div className="omasta-product-detail-art">
-          <ProductArt art={product.art} size="large" />
-          {product.badge ? <span className="orange-product-badge">{product.badge}</span> : null}
-        </div>
+        <ProductGallery product={product} images={getProductImages(product)} />
 
         <div className="omasta-product-detail-copy">
           <p className="orange-product-category">{product.category}</p>

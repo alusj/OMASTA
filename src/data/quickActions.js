@@ -1,77 +1,11 @@
 /**
- * Quick actions shown on Home.
+ * Explanatory flows for capabilities that need an Orange API not connected yet
+ * (airtime top-up, bill payment, roaming...). Services and assistant actions
+ * open these with `open_placeholder` instead of dead buttons. The Home and
+ * /services entries themselves live in `orangeServices.js`.
  *
- * Every entry resolves to a real destination inside the app. Where a capability
- * needs an Orange API that does not exist yet (airtime top-up, money transfer,
- * bill payment), the action opens an explanatory sheet describing what the flow
- * will do and offers the assistant instead. No dead buttons.
- */
-
-export const QUICK_ACTIONS = [
-  {
-    id: "buy-data",
-    label: "Buy data",
-    detail: "Browse bundles",
-    icon: "wifi",
-    action: { type: "navigate", target: "/shop", params: { tab: "bundles" } },
-  },
-  {
-    id: "buy-airtime",
-    label: "Buy airtime",
-    detail: "Top up a number",
-    icon: "smartphone",
-    action: {
-      type: "open_placeholder",
-      placeholderId: "airtime",
-    },
-  },
-  {
-    id: "send-money",
-    label: "Send money",
-    detail: "Orange Money",
-    icon: "send",
-    action: { type: "open_placeholder", placeholderId: "send-money" },
-  },
-  {
-    id: "pay-bills",
-    label: "Pay bills",
-    detail: "Utilities and more",
-    icon: "receipt",
-    action: { type: "open_placeholder", placeholderId: "pay-bills" },
-  },
-  {
-    id: "bundles",
-    label: "Bundles",
-    detail: "Compare plans",
-    icon: "layers",
-    action: { type: "navigate", target: "/shop", params: { tab: "bundles" } },
-  },
-  {
-    id: "my-number",
-    label: "My number",
-    detail: "Line details",
-    icon: "hash",
-    action: { type: "navigate", target: "/account" },
-  },
-  {
-    id: "support",
-    label: "Support",
-    detail: "Get help",
-    icon: "headphones",
-    action: { type: "navigate", target: "/support" },
-  },
-  {
-    id: "more",
-    label: "More",
-    detail: "Everything else",
-    icon: "grid",
-    action: { type: "open_placeholder", placeholderId: "more" },
-  },
-];
-
-/**
- * Copy for capabilities that are not built yet. These sheets are honest about
- * the state of the feature rather than pretending the action succeeded.
+ * These sheets are honest about the state of the feature rather than
+ * pretending the action succeeded.
  */
 export const PLACEHOLDER_FLOWS = {
   airtime: {
@@ -94,6 +28,20 @@ export const PLACEHOLDER_FLOWS = {
     body: "Bill payment needs the Orange Money payments API plus each biller integration. Until then, payments can be made at an Orange Money point or an authorised agent.",
     primary: { label: "Find a payment point", action: { type: "open_map", category: "money" } },
     secondary: { label: "Ask OMASTA AI", action: { type: "send_prompt", prompt: "Where can I pay a bill?" } },
+  },
+  "orange-money": {
+    title: "Orange Money",
+    summary: "Payments and history are not connected yet.",
+    body: "Send and Request on the Home balance card run as safe demo flows: nothing is moved or charged. Real transfers, payments, withdrawals and history need the Orange Money API and a verified customer session. An Orange Money point can handle them today.",
+    primary: { label: "Find Orange Money", action: { type: "open_map", category: "money" } },
+    secondary: { label: "Ask OMASTA AI", action: { type: "send_prompt", prompt: "How do Orange Money transfers work?" } },
+  },
+  roaming: {
+    title: "Roaming",
+    summary: "Roaming is not connected yet.",
+    body: "Activating roaming and roaming bundles needs the Orange line management API. Until then, an Orange shop or customer care can set it up before you travel.",
+    primary: { label: "Find an Orange shop", action: { type: "open_map", category: "shop" } },
+    secondary: { label: "Ask OMASTA AI", action: { type: "send_prompt", prompt: "How do I use my line abroad?" } },
   },
   more: {
     title: "More services",

@@ -10,15 +10,18 @@
  */
 
 import {
+  findBundleSync,
   findProductSync,
   listProductsSync,
   recommendBundles,
   listBundlesSync,
 } from "../catalog/catalogService.js";
+import { findOfferSync } from "../offers/offerService.js";
 import { getCategoryLabel, listLocations } from "../locations/locationService.js";
 import { findSupportTopic, getFlow, getFlowStep, listSupportTopics } from "../support/supportService.js";
 import {
   ActionType,
+  AssistantIntent,
   createAction,
   createActionButton,
   createReply,
@@ -459,6 +462,89 @@ function fallbackReply(context) {
   });
 }
 
+function simHelpReply() {
+  return createReply({
+    intent: "sim_support",
+    text: "What do you need help with on your SIM?",
+    actions: [
+      createActionButton({
+        label: "My SIM is not working",
+        variant: "primary",
+        action: createAction(ActionType.SEND_PROMPT, { prompt: "My SIM is not working" }),
+      }),
+      createActionButton({
+        label: "Replace or register a SIM",
+        action: createAction(ActionType.OPEN_MAP, { category: "shop" }),
+      }),
+      createActionButton({
+        label: "Get an eSIM",
+        action: createAction(ActionType.OPEN_PRODUCT, { productId: "esim-profile" }),
+      }),
+      createActionButton({
+        label: "Call customer care",
+        action: createAction(ActionType.CALL_SUPPORT, { topic: "sim" }),
+      }),
+    ],
+    suggestions: ["I forgot my PUK code", "Find an Orange shop"],
+  });
+}
+
+function offerReply(offerId) {
+  const offer = findOfferSync(offerId);
+
+  if (!offer) {
+    return null;
+  }
+
+  const bundle = offer.bundleId ? findBundleSync(offer.bundleId) : null;
+  const facts = [offer.value, offer.validity, offer.price].filter(Boolean).join(" · ");
+
+  return createReply({
+    intent: "offer_info",
+    text: `${offer.title}: ${facts}. ${offer.description} This is a sample offer for design review, not a live Orange promotion, and nothing is bought until you confirm on the bundle itself.`,
+    cards: bundle ? [bundleCard(bundle)] : [],
+    actions: [
+      createActionButton({
+        label: offer.cta || "See details",
+        variant: "primary",
+        action: offer.action,
+      }),
+      createActionButton({
+        label: "Compare all bundles",
+        action: createAction(ActionType.NAVIGATE, { target: "/shop", params: { tab: "bundles" } }),
+      }),
+    ],
+    suggestions: ["Help me choose a data plan", "Show me internet bundles"],
+  });
+}
+
+/**
+ * Structured intents from app entry points skip keyword matching entirely,
+ * so a tap on "Buy data" always lands on bundles whatever the label says.
+ */
+function routeByIntent(context) {
+  switch (context.intent) {
+    case AssistantIntent.BUY_DATA:
+      return bundlesReply({
+        need: "medium",
+        intentId: "buy_data",
+        text: "Here are data bundles from the sample catalogue. Open one to see the details; nothing is bought until you confirm.",
+      });
+
+    case AssistantIntent.FIND_AGENT:
+      return findPlacesReply("agent", context);
+
+    case AssistantIntent.SIM_SUPPORT:
+      return simHelpReply();
+
+    case AssistantIntent.OFFER_INFO:
+      return offerReply(context.focus?.offerId);
+
+    default:
+      return null;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Entry point                                                         */
 /* ------------------------------------------------------------------ */
@@ -474,6 +560,11 @@ export function routeMessage(text, context = {}) {
   const best = matchIntent(text);
   const nearby = has(normalized, NEARBY_PATTERNS);
   const trouble = has(normalized, TROUBLE_WORDS);
+
+  const structured = context.intent ? routeByIntent(context) : null;
+  if (structured) {
+    return structured;
+  }
 
   // A live troubleshooting flow continues unless the customer clearly changed subject.
   if (context.flow && best.score < 4) {

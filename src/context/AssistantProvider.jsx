@@ -83,6 +83,7 @@ export function AssistantProvider({ children }) {
   const [isThinking, setIsThinking] = useState(false);
   const [screenContext, setScreenContext] = useState({ screen: "home" });
   const [pendingLocationDetail, setPendingLocationDetail] = useState(null);
+  const [composerAutoFocus, setComposerAutoFocus] = useState(false);
 
   const flowRef = useRef(null);
   const lastPromptRef = useRef("");
@@ -120,10 +121,15 @@ export function AssistantProvider({ children }) {
     });
   }, []);
 
+  /**
+   * `options.intent` / `options.focus` come from structured entry points (Home
+   * suggestions, an offer's "Ask OMASTA") and apply to this request only.
+   */
   const buildContext = useCallback(
-    () => ({
+    (options = {}) => ({
       screen: screenContextRef.current?.screen || "home",
-      focus: screenContextRef.current?.focus || null,
+      focus: options.focus || screenContextRef.current?.focus || null,
+      intent: options.intent || null,
       coordinates: coordinatesRef.current,
       flow: flowRef.current,
     }),
@@ -149,7 +155,7 @@ export function AssistantProvider({ children }) {
   );
 
   const send = useCallback(
-    async (rawText) => {
+    async (rawText, options = {}) => {
       const text = String(rawText || "").trim();
 
       if (!text || isThinking) {
@@ -163,7 +169,7 @@ export function AssistantProvider({ children }) {
       try {
         const reply = await assistantService.send({
           text,
-          context: buildContext(),
+          context: buildContext(options),
           history: messages.slice(-8).map(({ role, text: body }) => ({ role, text: body })),
         });
 
@@ -321,10 +327,10 @@ export function AssistantProvider({ children }) {
         openPlaceholder,
         // Works whether the panel is already open (a tap inside the chat) or
         // not (an "Ask AI about this" button somewhere in the app).
-        sendPrompt: (prompt) => {
+        sendPrompt: (prompt, options) => {
           setIsOpen(true);
           ensureGreeting();
-          window.setTimeout(() => sendRef.current(prompt), 80);
+          window.setTimeout(() => sendRef.current(prompt, options), 80);
         },
         closeAssistant: ({ soft } = {}) => {
           // On a phone the panel covers the screen it just navigated to, so it
@@ -392,19 +398,36 @@ export function AssistantProvider({ children }) {
     [appendReply, executeAssistantAction]
   );
 
+  /**
+   * The one way into the conversation, shared by the floating button, the
+   * inline Home prompt and every "Ask OMASTA" button.
+   *
+   * @param {object} [options]
+   * @param {string} [options.prompt]      sent as the customer's message
+   * @param {string} [options.intent]      an AssistantIntent for that message
+   * @param {object} [options.focus]       e.g. { offerId } for that message
+   * @param {boolean} [options.focusInput] put the cursor in the composer
+   */
   const openAssistant = useCallback(
     (options = {}) => {
       setIsOpen(true);
+      setComposerAutoFocus(Boolean(options.focusInput) && !options.prompt);
       ensureGreeting(options.context);
 
       if (options.prompt) {
-        window.setTimeout(() => sendRef.current(options.prompt), 120);
+        window.setTimeout(
+          () => sendRef.current(options.prompt, { intent: options.intent, focus: options.focus }),
+          120
+        );
       }
     },
     [ensureGreeting]
   );
 
-  const closeAssistant = useCallback(() => setIsOpen(false), []);
+  const closeAssistant = useCallback(() => {
+    setIsOpen(false);
+    setComposerAutoFocus(false);
+  }, []);
 
   const clearConversation = useCallback(() => {
     flowRef.current = null;
@@ -425,6 +448,7 @@ export function AssistantProvider({ children }) {
       messages,
       isThinking,
       screenContext,
+      composerAutoFocus,
       suggestions: greetingFor(screenContext).suggestions,
       pendingLocationDetail,
       clearPendingLocationDetail: () => setPendingLocationDetail(null),
@@ -439,6 +463,7 @@ export function AssistantProvider({ children }) {
     [
       clearConversation,
       closeAssistant,
+      composerAutoFocus,
       isOpen,
       isThinking,
       messages,

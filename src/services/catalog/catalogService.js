@@ -68,6 +68,26 @@ export function getFeaturedProducts() {
   return PRODUCTS.filter((product) => product.badge || product.categoryId === "internet").slice(0, 5);
 }
 
+export async function listFeaturedProducts() {
+  return resolve(getFeaturedProducts());
+}
+
+/**
+ * A product's images, cover first. Products without an `images` list (for
+ * example from an older catalogue feed) fall back to their single artwork.
+ */
+export function getProductImages(product) {
+  if (!product) {
+    return [];
+  }
+
+  if (Array.isArray(product.images) && product.images.length) {
+    return product.images;
+  }
+
+  return [{ id: "cover", art: product.art, view: "front", label: product.name }];
+}
+
 /** Naive relevance search across the demo catalogue. */
 export function searchCatalog(query) {
   const term = query.trim().toLowerCase();

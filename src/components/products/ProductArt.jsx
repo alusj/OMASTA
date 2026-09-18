@@ -17,12 +17,20 @@ const ICONS = {
   accessory: Signal,
 };
 
-export default function ProductArt({ art = "router", size = "default" }) {
+/**
+ * `view` gives galleries distinct slides from the same motif:
+ * "front" (default), "angle", "detail" (close-up) and "box" (packaging).
+ */
+export default function ProductArt({ art = "router", size = "default", view = "front" }) {
   const Icon = ICONS[art] || Wifi;
 
   return (
-    <div className={`orange-product-art orange-product-art--${art} orange-product-art--${size}`} aria-hidden="true">
+    <div
+      className={`orange-product-art orange-product-art--${art} orange-product-art--${size} orange-product-art--view-${view}`}
+      aria-hidden="true"
+    >
       <div className="orange-product-glow" />
+      {view === "box" ? <span className="orange-product-box" /> : null}
       <div className="orange-product-device">
         <div className="orange-product-device-screen">
           <Icon size={26} strokeWidth={1.8} />

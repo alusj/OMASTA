@@ -154,7 +154,7 @@ export function createActionDispatcher(handlers) {
       }
 
       case ActionType.SEND_PROMPT: {
-        sendPrompt?.(action.prompt);
+        sendPrompt?.(action.prompt, { intent: action.intent, focus: action.focus });
         return { status: DispatchStatus.DONE };
       }
 

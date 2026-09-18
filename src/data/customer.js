@@ -3,8 +3,8 @@
  *
  * A stand-in for the signed-in customer. There is no authentication in this
  * build, so nothing here is a real account. The masked number is deliberately
- * incomplete and no balance is shown anywhere, because inventing one would
- * misrepresent the customer's actual line.
+ * incomplete. Demo balances live in `data/account.js`, are read through the
+ * account service and are always labelled as demo in the UI.
  */
 
 export const DEMO_CUSTOMER = {

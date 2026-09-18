@@ -19,6 +19,7 @@ export default function AssistantPanel() {
     isOpen,
     messages,
     isThinking,
+    composerAutoFocus,
     closeAssistant,
     clearConversation,
     send,
@@ -118,6 +119,7 @@ export default function AssistantPanel() {
         <footer className="omasta-assistant-footer">
           <AssistantInput
             onSend={send}
+            autoFocus={composerAutoFocus}
             disabled={isThinking}
             onVoice={() => showNotice("Voice input is not available yet. Type your question for now.")}
           />

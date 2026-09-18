@@ -6,7 +6,7 @@
   position: fixed;
   right: 18px;
   /* Sits clear of the bottom navigation on phones. */
-  bottom: calc(var(--omasta-nav-clearance) + 6px);
+  bottom: calc(var(--omasta-nav-clearance) + 6px + env(safe-area-inset-bottom, 0px));
   z-index: 55;
   display: inline-flex;
   align-items: center;

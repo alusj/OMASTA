@@ -375,3 +375,23 @@
 .orange-search-empty .omasta-ask-ai-button {
   margin-top: 14px;
 }
+
+/* ---------- Safe area (iPhone home indicator) ---------- */
+
+@media (max-width: 620px) {
+  .orange-bottom-nav {
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Five 60px links do not fit a 320px screen: let them share the bar evenly. */
+@media (max-width: 360px) {
+  .orange-bottom-nav {
+    padding-inline: 4px;
+  }
+
+  .orange-bottom-nav a {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}

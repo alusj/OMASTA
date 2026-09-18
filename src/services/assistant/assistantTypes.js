@@ -25,6 +25,19 @@ export const ActionType = {
   DISMISS: "dismiss",
 };
 
+/**
+ * Structured intents an entry point can attach to a prompt (Home suggestions,
+ * "Ask OMASTA about this offer"). The visible prompt text still goes into the
+ * conversation; the intent travels in the request context so every provider,
+ * local or remote, routes it deterministically instead of re-parsing text.
+ */
+export const AssistantIntent = {
+  BUY_DATA: "BUY_DATA",
+  FIND_AGENT: "FIND_AGENT",
+  SIM_SUPPORT: "SIM_SUPPORT",
+  OFFER_INFO: "OFFER_INFO",
+};
+
 export const CardType = {
   PRODUCT: "product",
   BUNDLE: "bundle",

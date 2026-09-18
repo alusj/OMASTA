@@ -1,0 +1,1507 @@
+/* Home dashboard: balance card, services, inline OMASTA AI, compact rails,
+   around you, recent activity; plus the product gallery, money flow sheet and
+   the /services and /activity screens that Home links to. */
+
+/* ---------- Layout ---------- */
+
+.omasta-home {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+  /* Keeps the last section clear of the floating OMASTA AI button. */
+  padding-bottom: 28px;
+}
+
+.omasta-home-top,
+.omasta-home-bottom {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+}
+
+.omasta-home-section {
+  min-width: 0;
+  margin: 0;
+  scroll-margin-top: 96px;
+}
+
+@media (max-width: 620px) {
+  .omasta-home {
+    margin-top: -8px;
+    gap: 26px;
+  }
+
+  .omasta-home-top,
+  .omasta-home-bottom {
+    gap: 26px;
+  }
+}
+
+/* Tablet and desktop: balance beside services + AI, then full-width rails,
+   then Around you beside Recent activity. */
+@media (min-width: 720px) {
+  .omasta-home {
+    gap: 34px;
+  }
+
+  .omasta-home-top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "balance services"
+      "balance ai";
+    gap: 22px 24px;
+    align-items: start;
+  }
+
+  .omasta-home-balance {
+    grid-area: balance;
+    height: 100%;
+  }
+
+  .omasta-home-services {
+    grid-area: services;
+  }
+
+  .omasta-home-ai-slot {
+    grid-area: ai;
+  }
+
+  .omasta-home-bottom {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+/* ---------- Compact section heading ---------- */
+
+.orange-section-heading--compact {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.orange-section-heading--compact .orange-section-heading-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+}
+
+.orange-section-heading--compact h2 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.orange-section-heading--compact .orange-text-button {
+  min-height: 36px;
+  padding: 0 2px;
+}
+
+/* ---------- Orange Money card ---------- */
+
+.omasta-money-card {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 18px 18px 16px;
+  border-radius: 24px;
+  background: #161616;
+  color: #fff;
+  box-shadow: 0 16px 36px rgba(22, 22, 22, 0.18);
+}
+
+/* One restrained accent: a soft orange light in the corner. */
+.omasta-money-card::before {
+  position: absolute;
+  z-index: -1;
+  top: -110px;
+  right: -90px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 121, 0, 0.34), rgba(255, 121, 0, 0) 70%);
+  content: "";
+}
+
+.omasta-money-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.omasta-money-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.omasta-money-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--orange);
+}
+
+.omasta-money-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.omasta-money-demo {
+  padding: 4px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffc796;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.orange-app .omasta-money-eye {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.orange-app .omasta-money-eye:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.omasta-money-eye:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.omasta-money-label {
+  margin: 16px 0 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.omasta-money-amount {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(1.8rem, 8.4vw, 2.35rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.omasta-money-card .omasta-skeleton {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.07) 25%,
+    rgba(255, 255, 255, 0.16) 37%,
+    rgba(255, 255, 255, 0.07) 63%
+  );
+  background-size: 400% 100%;
+}
+
+.omasta-money-unavailable {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+
+.orange-app .omasta-money-retry {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  min-height: 36px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffb877;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.omasta-money-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 16px;
+}
+
+.orange-app .omasta-money-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
+}
+
+.orange-app .omasta-money-action:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.orange-app .omasta-money-action--primary {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+.orange-app .omasta-money-action--primary:hover:not(:disabled) {
+  border-color: var(--orange-deep);
+  background: var(--orange-deep);
+}
+
+.omasta-money-action:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.omasta-money-lines {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.omasta-money-lines > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.omasta-money-lines > div + div {
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.omasta-money-lines dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.omasta-money-lines dd {
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.98rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 720px) {
+  .omasta-money-card {
+    padding: 24px 24px 20px;
+  }
+
+  .omasta-money-label {
+    margin-top: 26px;
+  }
+
+  .omasta-money-actions {
+    max-width: 360px;
+    margin-bottom: 26px;
+  }
+}
+
+/* ---------- Orange services ---------- */
+
+.omasta-services-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orange-app .omasta-service-button {
+  display: flex;
+  width: 100%;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--orange-ink);
+  transition: transform 150ms ease;
+}
+
+.orange-app .omasta-service-button:hover {
+  transform: translateY(-1px);
+}
+
+.omasta-service-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 17px;
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-sm);
+  color: var(--orange-deep);
+  transition: border-color 150ms ease;
+}
+
+.omasta-service-button:hover .omasta-service-icon {
+  border-color: var(--orange);
+}
+
+.omasta-service-text {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  text-align: center;
+}
+
+.omasta-service-label {
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.omasta-service-detail {
+  display: none;
+}
+
+/* Desktop: labelled tiles in a 2 x 2 grid instead of a stretched row. Between
+   720px and 1024px the column is narrow, so the compact phone row is kept. */
+@media (min-width: 1024px) {
+  .omasta-services-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .orange-app .omasta-service-button {
+    min-height: 72px;
+    flex-direction: row;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--orange-border);
+    background: var(--omasta-surface);
+    text-align: left;
+  }
+
+  .orange-app .omasta-service-button:hover {
+    border-color: var(--orange);
+  }
+
+  .omasta-service-button .omasta-service-icon {
+    width: 44px;
+    height: 44px;
+    border-color: transparent;
+    border-radius: 14px;
+    background: var(--orange-soft);
+    box-shadow: none;
+  }
+
+  .omasta-service-text {
+    text-align: left;
+  }
+
+  .omasta-service-label {
+    font-size: 0.84rem;
+  }
+
+  .omasta-service-detail {
+    display: block;
+    overflow: hidden;
+    color: var(--orange-muted);
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Inline OMASTA AI ---------- */
+
+.omasta-home-ai {
+  padding: 16px;
+  border: 1px solid var(--orange-border);
+  border-radius: 22px;
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-sm);
+}
+
+.omasta-home-ai-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.omasta-home-ai-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #ff8f1f, #ef6100);
+  color: #fff;
+}
+
+.omasta-home-ai-kicker {
+  margin: 0 0 2px;
+  color: var(--orange-deep);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.omasta-home-ai h2 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.omasta-home-ai-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--orange-border);
+  border-radius: var(--omasta-radius-pill);
+  background: var(--omasta-canvas);
+  transition: border-color 150ms ease;
+}
+
+.omasta-home-ai-field:hover,
+.omasta-home-ai-field:focus-within {
+  border-color: var(--orange);
+}
+
+.orange-app .omasta-home-ai-input {
+  min-width: 0;
+  min-height: 44px;
+  flex: 1;
+  overflow: hidden;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--orange-muted);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orange-app .omasta-home-ai-mic {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--omasta-surface);
+  box-shadow: var(--omasta-shadow-sm);
+  color: var(--orange-deep);
+}
+
+.omasta-home-ai-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.orange-app .omasta-home-ai-suggestions button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #f0d8bd;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+  font-size: 0.76rem;
+  font-weight: 750;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.orange-app .omasta-home-ai-suggestions button:hover {
+  border-color: var(--orange);
+  transform: translateY(-1px);
+}
+
+/* ---------- Horizontal rails ---------- */
+
+.omasta-rail {
+  display: grid;
+  grid-auto-columns: 148px;
+  grid-auto-flow: column;
+  gap: 12px;
+  margin: 0;
+  padding: 2px 0 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.omasta-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.omasta-rail-item {
+  display: flex;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.omasta-rail-skeleton {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+}
+
+/* Phones: rails bleed to the screen edge so the next card peeks in. */
+@media (max-width: 620px) {
+  .omasta-rail {
+    margin-inline: -14px;
+    padding-inline: 14px;
+    scroll-padding-inline: 14px;
+  }
+}
+
+@media (min-width: 621px) {
+  .omasta-rail {
+    grid-auto-columns: 172px;
+  }
+}
+
+/* Pointer devices get a thin scrollbar so overflow is discoverable. */
+@media (hover: hover) and (pointer: fine) {
+  .omasta-rail {
+    scrollbar-width: thin;
+    scrollbar-color: #ddd8d0 transparent;
+  }
+
+  .omasta-rail::-webkit-scrollbar {
+    display: block;
+    height: 6px;
+  }
+
+  .omasta-rail::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: #ddd8d0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .omasta-rail {
+    grid-auto-columns: minmax(180px, 1fr);
+  }
+}
+
+/* ---------- Compact product card ---------- */
+
+.omasta-mini-product {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.omasta-mini-product:hover {
+  border-color: #e0d6ca;
+  box-shadow: var(--omasta-shadow-md);
+  transform: translateY(-2px);
+}
+
+.omasta-mini-product:focus-visible,
+.omasta-mini-offer-main:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.omasta-mini-product-media {
+  position: relative;
+  display: block;
+  height: 104px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #fff4e6, #fbf8f3);
+}
+
+.omasta-mini-product-media .orange-product-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.omasta-mini-product-media .orange-product-glow {
+  top: 10%;
+  right: 12%;
+  width: 90px;
+  height: 90px;
+  background: rgba(255, 153, 51, 0.22);
+}
+
+.omasta-mini-product-media .orange-product-orbit {
+  display: none;
+}
+
+.omasta-mini-product-media .orange-product-device {
+  right: auto;
+  left: 50%;
+  width: 58px;
+  height: 76px;
+  border-width: 4px;
+  border-radius: 14px;
+  box-shadow: 6px 7px 0 rgba(0, 0, 0, 0.07), 0 10px 18px rgba(0, 0, 0, 0.12);
+  transform: translate(-50%, -50%) rotate(10deg);
+}
+
+.omasta-mini-product-media .orange-product-device-screen {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+
+.omasta-mini-product-media .orange-product-device-screen svg {
+  width: 16px;
+  height: 16px;
+}
+
+.omasta-mini-product-media .orange-product-device-light {
+  bottom: 12px;
+  width: 4px;
+  height: 4px;
+}
+
+.omasta-mini-product-media .orange-product-device-line {
+  bottom: 6px;
+  width: 18px;
+  height: 3px;
+}
+
+.omasta-product-media-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.omasta-mini-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: var(--omasta-radius-pill);
+  background: var(--orange-ink);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.omasta-mini-product-body {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px 12px;
+}
+
+.omasta-mini-product-body strong {
+  display: -webkit-box;
+  min-height: 2.5em;
+  overflow: hidden;
+  font-size: 0.82rem;
+  font-weight: 750;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.omasta-mini-product-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.omasta-mini-product-price svg {
+  flex: 0 0 auto;
+  color: var(--orange-deep);
+}
+
+/* ---------- Compact offer card ---------- */
+
+.omasta-mini-offer {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.orange-app .omasta-mini-offer-main {
+  display: grid;
+  width: 100%;
+  min-height: 146px;
+  align-content: start;
+  justify-items: start;
+  gap: 2px;
+  padding: 12px 12px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  text-align: left;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.orange-app .omasta-mini-offer-main:hover {
+  border-color: #e0d6ca;
+  box-shadow: var(--omasta-shadow-md);
+  transform: translateY(-2px);
+}
+
+.omasta-mini-offer-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-mini-offer-title {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.omasta-mini-offer-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.omasta-mini-offer-meta {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+}
+
+.omasta-mini-offer-price {
+  margin-top: 8px;
+  color: var(--orange-deep);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.orange-app .omasta-mini-offer-ask {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--orange-deep);
+  transition: background 150ms ease;
+}
+
+.orange-app .omasta-mini-offer-ask:hover {
+  background: var(--orange-soft);
+}
+
+/* ---------- Around you ---------- */
+
+.omasta-around {
+  display: grid;
+  gap: 10px;
+}
+
+.omasta-around-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.orange-app .omasta-around-shortcuts button {
+  display: flex;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 4px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  font-size: 0.76rem;
+  font-weight: 750;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.orange-app .omasta-around-shortcuts button:hover {
+  border-color: var(--orange);
+  transform: translateY(-1px);
+}
+
+.omasta-around-icon,
+.omasta-around-nearest-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-around-nearest,
+.orange-app .omasta-around-locate {
+  display: flex;
+  width: 100%;
+  min-height: 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+}
+
+.orange-app .omasta-around-locate {
+  color: var(--orange-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.omasta-around-locate span {
+  flex: 1;
+}
+
+.omasta-around-locate svg {
+  flex: 0 0 auto;
+  color: var(--orange-deep);
+}
+
+.omasta-around-locate:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.omasta-around-nearest-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 1px;
+}
+
+.omasta-around-nearest-copy small {
+  color: var(--orange-muted);
+  font-size: 0.66rem;
+  font-weight: 650;
+}
+
+.omasta-around-nearest-copy strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.omasta-around-nearest-copy span {
+  color: var(--orange-deep);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.omasta-around-directions {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  color: var(--orange-deep);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+/* ---------- Recent activity ---------- */
+
+.omasta-activity {
+  margin: 0;
+  padding: 2px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+  list-style: none;
+}
+
+.omasta-activity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.omasta-activity-row + .omasta-activity-row {
+  border-top: 1px solid #f0eeea;
+}
+
+.omasta-activity-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: #f4f2ef;
+  color: var(--omasta-ink-soft);
+}
+
+.omasta-activity-icon.is-in {
+  background: var(--omasta-success-soft);
+  color: var(--omasta-success);
+}
+
+.omasta-activity-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 3px;
+}
+
+.omasta-activity-copy strong,
+.omasta-activity-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.omasta-activity-copy strong {
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.omasta-activity-copy small {
+  color: var(--orange-muted);
+  font-size: 0.7rem;
+}
+
+.omasta-activity-amount {
+  flex: 0 0 auto;
+  color: var(--orange-ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.omasta-activity-amount.is-in {
+  color: var(--omasta-success);
+}
+
+.omasta-activity-state {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 18px;
+  border: 1px dashed #ded8cd;
+  border-radius: 18px;
+  color: var(--orange-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.omasta-activity-state p {
+  margin: 0;
+}
+
+.omasta-activity-page {
+  max-width: 720px;
+}
+
+@media (max-width: 360px) {
+  .omasta-activity {
+    padding-inline: 12px;
+  }
+
+  .omasta-activity-row {
+    gap: 10px;
+  }
+
+  .omasta-activity-amount {
+    font-size: 0.74rem;
+  }
+}
+
+/* ---------- /services ---------- */
+
+.omasta-services-group {
+  margin-top: 24px;
+}
+
+.omasta-services-group h2 {
+  margin: 0 0 10px;
+  color: var(--orange-ink);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.omasta-services-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orange-app .omasta-services-item {
+  display: flex;
+  width: 100%;
+  min-height: 66px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 18px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  text-align: left;
+  transition: border-color 150ms ease;
+}
+
+.orange-app .omasta-services-item:hover {
+  border-color: var(--orange);
+}
+
+.omasta-services-item .omasta-service-icon {
+  width: 42px;
+  height: 42px;
+  border-color: transparent;
+  border-radius: 14px;
+  background: var(--orange-soft);
+  box-shadow: none;
+}
+
+.omasta-services-item-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.omasta-services-item-copy strong {
+  font-size: 0.86rem;
+}
+
+.omasta-services-item-copy small {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+}
+
+.omasta-services-item > svg:last-child {
+  flex: 0 0 auto;
+  color: #aaa6a0;
+}
+
+/* ---------- Product gallery ---------- */
+
+.omasta-gallery {
+  position: relative;
+  min-width: 0;
+}
+
+.omasta-gallery-track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-radius: var(--omasta-radius-md);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.omasta-gallery-track::-webkit-scrollbar {
+  display: none;
+}
+
+.omasta-gallery-track:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+.omasta-product-detail-art.omasta-gallery-slide {
+  min-height: 240px;
+  flex: 0 0 100%;
+  border-radius: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.omasta-gallery-slide--angle {
+  background: linear-gradient(200deg, #fff0e0, #f7f4ef);
+}
+
+.omasta-gallery-slide--detail {
+  background: linear-gradient(160deg, #1f1f1f, #2e2823);
+}
+
+.omasta-gallery-slide--box {
+  background: linear-gradient(160deg, #f6f4f0, #ebe7e0);
+}
+
+.omasta-product-detail-art .orange-product-art--view-angle .orange-product-device {
+  transform: translate(-50%, -50%) rotate(-16deg) scale(0.94);
+}
+
+.omasta-product-detail-art .orange-product-art--view-angle .orange-product-glow {
+  right: auto;
+  left: 8%;
+}
+
+.omasta-product-detail-art .orange-product-art--view-detail .orange-product-device {
+  transform: translate(-50%, -34%) scale(1.6);
+}
+
+.omasta-product-detail-art .orange-product-art--view-detail .orange-product-glow,
+.omasta-product-detail-art .orange-product-art--view-detail .orange-product-orbit,
+.omasta-product-detail-art .orange-product-art--view-box .orange-product-orbit {
+  display: none;
+}
+
+.omasta-product-detail-art .orange-product-art--view-box .orange-product-device {
+  transform: translate(-50%, -66%) scale(0.72);
+}
+
+.orange-product-box {
+  position: absolute;
+  z-index: 2;
+  bottom: 14%;
+  left: 50%;
+  width: 164px;
+  height: 78px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ff8f1f, #e85d00);
+  box-shadow: 0 16px 26px rgba(120, 50, 0, 0.22);
+  transform: translateX(-50%);
+}
+
+.orange-product-box::after {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 44px;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.85);
+  content: "";
+}
+
+.omasta-gallery-badge {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 14px;
+}
+
+.orange-app .omasta-gallery-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--orange-border);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--omasta-shadow-sm);
+  color: var(--orange-ink);
+  transform: translateY(-50%);
+}
+
+.omasta-gallery-arrow--prev {
+  left: 10px;
+}
+
+.omasta-gallery-arrow--next {
+  right: 10px;
+}
+
+.omasta-gallery-arrow:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+/* Touch screens swipe; the arrows are for pointer users. */
+@media (hover: none) {
+  .orange-app .omasta-gallery-arrow {
+    display: none;
+  }
+}
+
+.omasta-gallery-dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 10px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  border-radius: var(--omasta-radius-pill);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--omasta-shadow-sm);
+  transform: translateX(-50%);
+}
+
+.orange-app .omasta-gallery-dots button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.omasta-gallery-dots button::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: #cfc9c0;
+  content: "";
+  transition: width 180ms ease, background 180ms ease;
+}
+
+.omasta-gallery-dots button.is-active::before {
+  width: 16px;
+  background: var(--orange);
+}
+
+/* ---------- Send / Request money (demo) ---------- */
+
+.omasta-money-flow form {
+  display: grid;
+  gap: 14px;
+}
+
+.omasta-field {
+  display: grid;
+  gap: 6px;
+}
+
+.omasta-field > span {
+  color: var(--omasta-ink-soft);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.orange-app .omasta-field input,
+.omasta-field input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--orange-border);
+  border-radius: 14px;
+  background: var(--omasta-surface);
+  color: var(--orange-ink);
+  /* 16px prevents iOS zooming into the field. */
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.omasta-field input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.14);
+}
+
+.omasta-field input[aria-invalid="true"] {
+  border-color: var(--omasta-danger);
+}
+
+.omasta-field small {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+}
+
+.omasta-field small.is-error {
+  color: var(--omasta-danger);
+  font-weight: 650;
+}
+
+.omasta-money-flow-next {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.84rem;
+}
+
+.omasta-money-flow-lead {
+  margin: 0;
+  color: var(--orange-muted);
+  font-size: 0.8rem;
+}
+
+.omasta-money-flow-total {
+  margin: 4px 0 14px;
+  color: var(--orange-ink);
+  font-size: 1.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.omasta-money-flow-auth {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 11px 13px;
+  border-radius: var(--omasta-radius-sm);
+  background: var(--omasta-success-soft);
+  color: #2c5a2e;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.omasta-money-flow-auth svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.omasta-money-flow-error {
+  margin: 12px 0 0;
+  color: var(--omasta-danger);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.omasta-money-flow-result {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.omasta-money-flow-result-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 6px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--orange-soft);
+  color: var(--orange-deep);
+}
+
+.omasta-money-flow-result h3 {
+  margin: 0;
+  color: var(--orange-ink);
+  font-size: 1.02rem;
+}
+
+.omasta-money-flow-result p {
+  margin: 0;
+  color: var(--omasta-ink-soft);
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.omasta-money-flow-result .omasta-money-flow-ref {
+  color: var(--orange-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.omasta-money-flow-result .omasta-demo-note {
+  text-align: left;
+}
+
+.omasta-spin {
+  animation: omasta-spin 900ms linear infinite;
+}
+
+@keyframes omasta-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .omasta-spin {
+    animation-duration: 2.4s;
+  }
+}

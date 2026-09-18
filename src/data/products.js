@@ -6,6 +6,23 @@
  * catalogue API response shaped the same way (see services/catalog).
  */
 
+/**
+ * Product imagery.
+ *
+ * `images` is an ordered list; the first entry is the cover used on cards.
+ * An entry with `src` renders as a real photo: { id, src, label }. Until real
+ * Orange product photography is supplied, entries without `src` render the
+ * illustrated device motif from a different view, so galleries already work.
+ */
+function illustratedViews(art) {
+  return [
+    { id: "front", art, view: "front", label: "Front view (illustration)" },
+    { id: "angle", art, view: "angle", label: "Angled view (illustration)" },
+    { id: "detail", art, view: "detail", label: "Close-up (illustration)" },
+    { id: "box", art, view: "box", label: "In the box (illustration)" },
+  ];
+}
+
 export const PRODUCT_CATEGORIES = [
   { id: "all", label: "All" },
   { id: "phones", label: "Phones" },
@@ -29,6 +46,7 @@ export const PRODUCTS = [
     note: "Device only",
     badge: "Popular",
     art: "router",
+    images: illustratedViews("router"),
     highlights: ["Up to 32 connected devices", "Works with any Orange data plan", "Simple setup, no engineer needed"],
     specs: [
       { label: "Network", value: "4G LTE" },
@@ -51,6 +69,7 @@ export const PRODUCTS = [
     note: "Device only",
     badge: null,
     art: "mifi",
+    images: illustratedViews("mifi"),
     highlights: ["Up to 10 devices", "All-day battery", "Pairs with any data bundle"],
     specs: [
       { label: "Network", value: "4G LTE" },
@@ -73,6 +92,7 @@ export const PRODUCTS = [
     note: "Or pay in instalments",
     badge: "New",
     art: "phone",
+    images: illustratedViews("phone"),
     highlights: ["6.6 inch display", "5000 mAh battery", "Dual SIM + eSIM ready"],
     specs: [
       { label: "Storage", value: "128 GB" },
@@ -94,6 +114,7 @@ export const PRODUCTS = [
     note: "Device only",
     badge: null,
     art: "phone",
+    images: illustratedViews("phone"),
     highlights: ["Long battery life", "Orange Money ready", "Dual SIM"],
     specs: [
       { label: "Storage", value: "64 GB" },
@@ -116,6 +137,7 @@ export const PRODUCTS = [
     note: "Includes starter credit",
     badge: null,
     art: "sim",
+    images: illustratedViews("sim"),
     highlights: ["Same-day activation", "Keep your number when you upgrade", "ID required for registration"],
     specs: [
       { label: "Format", value: "Nano / Micro / Standard" },
@@ -136,6 +158,7 @@ export const PRODUCTS = [
     note: "Compatible devices only",
     badge: "Digital",
     art: "sim",
+    images: illustratedViews("sim"),
     highlights: ["No physical card", "Keep a second line active", "Transferable between devices"],
     specs: [
       { label: "Requires", value: "eSIM capable device" },
@@ -156,6 +179,7 @@ export const PRODUCTS = [
     note: "12 month warranty",
     badge: null,
     art: "accessory",
+    images: illustratedViews("accessory"),
     highlights: ["Charges a phone up to 4 times", "Dual USB output", "Charges a MiFi too"],
     specs: [
       { label: "Capacity", value: "20,000 mAh" },
@@ -176,6 +200,7 @@ export const PRODUCTS = [
     note: "Promotional pack",
     badge: "Save",
     art: "router",
+    images: illustratedViews("router"),
     highlights: ["Router included", "50 GB for the first month", "Set up in minutes"],
     specs: [
       { label: "Includes", value: "4G Home Router" },

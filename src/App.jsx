@@ -8,6 +8,7 @@ import "./styles/theme.css";
 import "./styles/shell.css";
 import "./styles/screens.css";
 import "./styles/assistant.css";
+import "./styles/home.css";
 
 /**
  * Provider order matters: the assistant dispatches into the UI and location
