@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test src/*.test.mjs server/*.test.mjs",
+    "test": "node --test src/*.test.mjs server/*.test.mjs api/churn-model/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

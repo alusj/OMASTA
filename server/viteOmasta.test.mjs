@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {omastaPlugin} from './viteOmasta.mjs';
 async function request({method='POST',url='/',host='127.0.0.1:5173',origin,body='{"message":"Hello"}'}={}) {
   let middleware;const timeouts=[];
-  omastaPlugin({GEMINI_API_KEY:'test-only'},{reply:async()=>({text:'Answer',provider:'Gemini'})}).configureServer({middlewares:{use:(path,handler)=>{assert.equal(path,'/api/omasta');middleware=handler;}}});
+  omastaPlugin({GEMINI_API_KEY:'test-only'},{reply:async()=>({text:'Answer',provider:'Gemini'})}).configureServer({middlewares:{use:(path,handler)=>{if(path==='/api/omasta')middleware=handler;}}});
   const req={method,url,headers:{host,...(origin?{origin}:{})},socket:{remoteAddress:'127.0.0.1'},setTimeout:value=>timeouts.push(value),async *[Symbol.asyncIterator](){yield body;}};
   let result;const res={setHeader(){},statusCode:200,end:text=>{result={status:res.statusCode,body:JSON.parse(text)};}};
   await middleware(req,res);return {...result,timeouts};

@@ -9,6 +9,7 @@ const fields = {
   customerServiceCalls:['customerservicecalls','custservcalls'],
 };
 export const datasetTemplate = 'state,area_code,account_length,international_plan,voice_mail_plan,total_day_minutes,total_day_calls,total_day_charge,total_eve_minutes,total_eve_calls,total_eve_charge,total_night_minutes,total_night_calls,total_night_charge,total_intl_minutes,total_intl_calls,total_intl_charge,customer_service_calls,churn';
+export function datasetBadge(source) { return source==='imported'?'Imported dataset':'Sample data'; }
 function readCSV(text) {
   const rows=[];let row=[],cell='',quoted=false;
   for(let i=0;i<text.length;i++) {

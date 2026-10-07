@@ -22,6 +22,15 @@ Set `GEMINI_API_KEY` in the server's `.env`, then restart Vite. The existing loc
 
 The `/api/omasta` middleware exists only in the local Vite development server. It accepts same-origin localhost requests, caps input size and rate, and sends whitelisted numeric aggregate statistics plus user questions and recent conversation turns to Gemini. Raw customer rows, record identifiers, states, area codes, filenames and environment values are excluded from AI context. User-entered chat messages are sent to Gemini as written. Do not put personal information or secrets in chat.
 
+## Deployed churn prototype API
+
+Deploy the `web` folder to Vercel. Vercel serves the static dashboard and the included serverless functions from the same domain:
+
+- `GET /api/churn-model/status` returns model version, train/holdout counts, evaluation metrics, and confusion matrix.
+- `POST /api/churn-model/predict` accepts one compatible customer record and returns a bounded prototype probability, risk band, and three feature signals.
+
+The prototype is public by request and has no authentication layer. Do not send personal customer data to this endpoint until Orange approves the required data protection, access-control, and monitoring design. The bundled model is trained from the Kaggle sample only and must not be used to make automated customer decisions.
+
 The assistant shows loading, connection, quota and failure states. Provider failures never produce a fabricated local AI answer. Filtering or changing dataset/department resets the conversation so old cohort context does not carry into a new analysis. Context statistics are client-provided in this preview, so they are not a production source of truth.
 
 Production hosting needs an authenticated backend endpoint, server-side department-scoped data queries, secret management and persisted assignments. The static build alone does not include the local AI endpoint.

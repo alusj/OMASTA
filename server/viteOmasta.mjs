@@ -1,6 +1,18 @@
 import { createOmastaReply } from './omasta.mjs';
+import { loadChurnArtifact, predictChurn, summariseModel } from './churnModel.mjs';
 export function omastaPlugin(env,{reply=createOmastaReply}={}) {
   return {name:'omasta-local-api',configureServer(server){
+    server.middlewares.use('/api/churn-model',async(req,res)=>{
+      res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');
+      const respond=(status,data)=>{res.statusCode=status;res.end(JSON.stringify(data));};
+      const host=(req.headers.host??'').split(':')[0];
+      if(!['127.0.0.1','localhost'].includes(host))return respond(403,{error:'Churn prototype API is available on localhost only.'});
+      if(req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`)return respond(403,{error:'Use the same-origin preview to access the churn prototype.'});
+      let artifact;try{artifact=await loadChurnArtifact(new URL('../ml/model/churn-prototype.json',import.meta.url));}catch{return respond(503,{error:'Model not trained. Run the local trainer first.'});}
+      if(req.url==='/status'&&req.method==='GET')return respond(200,summariseModel(artifact));
+      if((req.url==='/'||req.url==='')&&req.method==='POST'){let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>16000)return respond(413,{error:'Prediction input is too large.'});}try{const input=JSON.parse(body);return respond(200,predictChurn(artifact,input));}catch{return respond(400,{error:'Send one valid customer record as JSON.'});}}
+      return respond(404,{error:'Unknown endpoint.'});
+    });
     const requests=new Map();
     server.middlewares.use('/api/omasta',async(req,res)=>{
       res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');

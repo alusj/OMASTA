@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCustomerCSV, summariseCustomers, reviewSignals, selectCustomers, datasetTemplate, exportCustomerCSV } from './analytics.mjs';
+import { parseCustomerCSV, summariseCustomers, reviewSignals, selectCustomers, datasetTemplate, exportCustomerCSV, datasetBadge } from './analytics.mjs';
 const row = 'WA,415,120,yes,no,220,100,37.4,180,80,15.3,150,70,6.75,12,4,3.24,4,true';
 test('CSV maps familiar telecom headers, plans and churn outcomes', () => {
   const rows = parseCustomerCSV(datasetTemplate + '\n' + row);
@@ -52,4 +52,8 @@ test('customer exports preserve usage fields and department, neutralising formul
   assert.ok(restored[0].state.startsWith("'="));
   assert.equal(restored[0].department,'B2B');
   assert.equal(restored[0].eveningCharge,15.3);
+});
+test('dataset badge distinguishes an imported customer dataset from sample records', () => {
+  assert.equal(datasetBadge('sample'),'Sample data');
+  assert.equal(datasetBadge('imported'),'Imported dataset');
 });
