@@ -18,7 +18,7 @@ Follow-up signals identify customers with 4+ customer service calls or an intern
 
 ## OMASTA and Gemini
 
-Set `GEMINI_API_KEY` in the server's `.env`, then restart Vite. The existing local key is used without modification. `GEMINI_MODEL` optionally overrides the default `gemini-3.8-flash`. The key is loaded server-side and is never passed to the browser. OMASTA uses the AI SDK's Google provider; provider setup is documented at [AI SDK Google provider](https://ai-sdk.dev/providers/ai-sdk-providers/google), with current model identifiers in [Google's model catalogue](https://ai.google.dev/gemini-api/docs/models).
+Set `GEMINI_API_KEY` in the server's `.env`, then restart Vite. The existing local key is used without modification. `GEMINI_MODEL` optionally overrides the default `gemini-3.5-flash`. The key is loaded server-side and is never passed to the browser. OMASTA uses the AI SDK's Google provider; provider setup is documented at [AI SDK Google provider](https://ai-sdk.dev/providers/ai-sdk-providers/google), with current model identifiers in [Google's model catalogue](https://ai.google.dev/gemini-api/docs/models).
 
 The `/api/omasta` middleware exists only in the local Vite development server. It accepts same-origin localhost requests, caps input size and rate, and sends whitelisted numeric aggregate statistics plus user questions and recent conversation turns to Gemini. Raw customer rows, record identifiers, states, area codes, filenames and environment values are excluded from AI context. User-entered chat messages are sent to Gemini as written. Do not put personal information or secrets in chat.
 

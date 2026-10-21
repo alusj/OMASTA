@@ -1,4 +1,4 @@
-import { createOmastaReply } from './omasta.mjs';
+import { createOmastaReply, DEFAULT_MODEL } from './omasta.mjs';
 import { loadChurnArtifact, predictChurn, summariseModel } from './churnModel.mjs';
 export function omastaPlugin(env,{reply=createOmastaReply}={}) {
   return {name:'omasta-local-api',configureServer(server){
@@ -20,7 +20,7 @@ export function omastaPlugin(env,{reply=createOmastaReply}={}) {
       const host=(req.headers.host??'').split(':')[0];
       if(!['127.0.0.1','localhost'].includes(host))return respond(403,{error:'OMASTA preview API is available on localhost only.'});
       if(req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`)return respond(403,{error:'Use the same-origin preview to access OMASTA.'});
-      if(req.url==='/status'&&req.method==='GET')return respond(200,{configured:Boolean(env.GEMINI_API_KEY),provider:'Gemini',model:env.GEMINI_MODEL||'gemini-3.8-flash'});
+      if(req.url==='/status'&&req.method==='GET')return respond(200,{configured:Boolean(env.GEMINI_API_KEY),provider:'Gemini',model:env.GEMINI_MODEL||DEFAULT_MODEL});
       if(req.url!=='/'&&req.url!=='')return respond(404,{error:'Unknown endpoint.'});
       if(req.method!=='POST')return respond(405,{error:'Use POST for OMASTA questions.'});
       const address=req.socket.remoteAddress??'local',now=Date.now(),recent=(requests.get(address)??[]).filter(t=>now-t<60000);

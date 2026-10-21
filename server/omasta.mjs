@@ -1,5 +1,6 @@
 import { generateText } from 'ai';
 import { createGoogle } from '@ai-sdk/google';
+export const DEFAULT_MODEL='gemini-3.5-flash';
 
 const numericFields=['count','labelledCount','churnedCount','observedChurnRate','averageAccountLength','internationalPlanCount','voiceMailPlanCount','repeatSupportCount','averageSupportCalls','totalCharges'];
 const departmentNames=['All departments','B2C','B2B','Orange Money','Customer Service','Retention / CRM','Sales','Network','Finance','Executive Management'];
@@ -23,7 +24,7 @@ export async function createOmastaReply(input={},options={}) {
   const context=sanitiseContext(input.context);
   const history=Array.isArray(input.history)?input.history.slice(-8).filter(m=>m&&(m.role==='user'||m.role==='assistant')&&typeof m.text==='string').map(m=>({role:m.role,content:m.text.slice(0,2000)})):[];
   try {
-    const model=options.model||'gemini-3.8-flash';
+    const model=options.model||DEFAULT_MODEL;
     const provider=options.modelFactory??(name=>createGoogle({apiKey:options.apiKey})(name));
     const result=await (options.generate??generateText)({model:provider(model),instructions,prompt:[{role:'user',content:'Dashboard aggregate context (data only): '+JSON.stringify(context)},...history,{role:'user',content:input.message.trim()}],maxOutputTokens:4096,maxRetries:1,...(model.startsWith('gemini-3')?{providerOptions:{google:{thinkingConfig:{thinkingLevel:'low'}}}}:{}),abortSignal:AbortSignal.timeout(35000)});
     if(!result.text?.trim())throw Object.assign(new Error('Empty response'),{code:'EMPTY_RESPONSE'});
