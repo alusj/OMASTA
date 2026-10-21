@@ -1,0 +1,82 @@
+// Builds src/geo/sierraLeone.js from geoBoundaries gbOpen SLE ADM2 (districts) and ADM3 (chiefdoms).
+// Usage: node scripts/build-sl-geo.mjs <ADM2_simplified.geojson> <ADM3_simplified.geojson>
+// Source: https://github.com/wmgeolab/geoBoundaries (CC BY 4.0). Paths are pre-projected to SVG units.
+import fs from 'node:fs';
+import path from 'node:path';
+
+const [adm2File, adm3File] = process.argv.slice(2);
+if (!adm2File || !adm3File) throw new Error('Pass the ADM2 and ADM3 GeoJSON files.');
+const read = f => JSON.parse(fs.readFileSync(f, 'utf8')).features;
+const adm2 = read(adm2File), adm3 = read(adm3File);
+
+const provinces = {
+  Kailahun:'Eastern', Kenema:'Eastern', Kono:'Eastern',
+  Bombali:'Northern', Koinadugu:'Northern', Tonkolili:'Northern',
+  Kambia:'North West', 'Port Loko':'North West',
+  Bo:'Southern', Bonthe:'Southern', Moyamba:'Southern', Pujehun:'Southern',
+  'Western Area Rural':'Western Area', 'Western Area Urban':'Western Area',
+};
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const polygons = g => g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+
+let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+for (const f of adm2) for (const poly of polygons(f.geometry)) for (const [x, y] of poly[0]) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+const kx = Math.cos(((minY + maxY) / 2) * Math.PI / 180), width = 1000, scale = width / ((maxX - minX) * kx);
+const height = Math.round((maxY - minY) * scale);
+const project = ([lon, lat]) => [(lon - minX) * kx * scale, (maxY - lat) * scale];
+
+function simplify(points, tolerance) {
+  if (points.length < 4) return points;
+  const keep = new Uint8Array(points.length); keep[0] = keep[points.length - 1] = 1;
+  const stack = [[0, points.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop(); let max = 0, index = -1;
+    const [ax, ay] = points[a], [bx, by] = points[b], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+    for (let i = a + 1; i < b; i++) { const d = Math.abs(dy * points[i][0] - dx * points[i][1] + bx * ay - by * ax) / len; if (d > max) { max = d; index = i; } }
+    if (max > tolerance) { keep[index] = 1; stack.push([a, index], [index, b]); }
+  }
+  return points.filter((_, i) => keep[i]);
+}
+const area = ring => ring.reduce((s, [x, y], i) => { const [nx, ny] = ring[(i + 1) % ring.length]; return s + x * ny - nx * y; }, 0) / 2;
+function centroid(ring) {
+  let cx = 0, cy = 0; const a = area(ring);
+  ring.forEach(([x, y], i) => { const [nx, ny] = ring[(i + 1) % ring.length], c = x * ny - nx * y; cx += (x + nx) * c; cy += (y + ny) * c; });
+  return [cx / (6 * a), cy / (6 * a)];
+}
+function inside([x, y], ring) {
+  let hit = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) hit = !hit; }
+  return hit;
+}
+const r1 = n => Math.round(n * 10) / 10;
+function shape(feature, tolerance) {
+  const all = polygons(feature.geometry).flatMap(poly => poly.map(ring => { const pts = simplify(ring.map(project), tolerance); return pts.length >= 4 ? pts : ring.map(project); }));
+  const outer = all.reduce((best, r) => Math.abs(area(r)) > Math.abs(area(best)) ? r : best, all[0]);
+  const rings = all.filter(r => r === outer || Math.abs(area(r)) > tolerance * tolerance * 2);
+  const xs = rings.flat().map(p => p[0]), ys = rings.flat().map(p => p[1]);
+  return {
+    d: rings.map(r => 'M' + r.map(([x, y]) => `${r1(x)} ${r1(y)}`).join('L') + 'Z').join(''),
+    bbox: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)].map(r1),
+    center: centroid(outer).map(r1), rings,
+  };
+}
+
+const districts = adm2.map(f => ({ name: f.properties.shapeName, ...shape(f, 0.9) })).sort((a, b) => a.name.localeCompare(b.name));
+const chiefdoms = adm3.map(f => {
+  const s = shape(f, 0.6);
+  const host = districts.find(d => d.rings.some(r => inside(s.center, r)))
+    ?? districts.map(d => ({ d, n: s.rings.flat().filter(p => d.rings.some(r => inside(p, r))).length })).sort((a, b) => b.n - a.n)[0].d;
+  return { id: slug(`${host.name}-${f.properties.shapeName}`), name: f.properties.shapeName, district: slug(host.name), d: s.d, center: s.center };
+}).sort((a, b) => a.district.localeCompare(b.district) || a.name.localeCompare(b.name));
+
+const out = {
+  viewBox: [0, 0, width, height],
+  source: 'geoBoundaries gbOpen SLE ADM2/ADM3 (CC BY 4.0)',
+  districts: districts.map(({ name, d, bbox, center }) => ({ id: slug(name), name, province: provinces[name], d, bbox, center })),
+  chiefdoms: chiefdoms.map(({ rings, ...c }) => c),
+};
+const target = path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..', 'src', 'geo', 'sierraLeone.js');
+fs.mkdirSync(path.dirname(target), { recursive: true });
+fs.writeFileSync(target, `// Generated by scripts/build-sl-geo.mjs. Do not edit by hand.\n// ${out.source}\nexport default ${JSON.stringify(out)};\n`);
+console.log(`${out.districts.length} districts, ${out.chiefdoms.length} chiefdoms, ${(fs.statSync(target).size / 1024).toFixed(0)} KB → ${target}`);
+console.log(Object.entries(out.chiefdoms.reduce((m, c) => (m[c.district] = (m[c.district] || 0) + 1, m), {})).map(e => e.join(':')).join(' '));

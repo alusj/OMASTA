@@ -1,4 +1,4 @@
-export const departments = ['B2C', 'B2B', 'Orange Money', 'Customer Service', 'Retention / CRM', 'Sales', 'Network', 'Finance', 'Executive Management'];
+export const departments = ['B2C', 'B2B', 'Orange Money', 'Customer Service', 'Retention / CRM', 'Sales', 'Network', 'Executive Management'];
 export const business = [
   {name:'B2C', label:'Consumer business', customers:842600, risk:136501, rate:16.2, revenue:32.8, color:'#ff7900', trend:'+2.8'},
   {name:'B2B', label:'Enterprise business', customers:12840, risk:822, rate:6.4, revenue:18.6, color:'#367cf6', trend:'−0.6'},

@@ -3,7 +3,7 @@ import { createGoogle } from '@ai-sdk/google';
 export const DEFAULT_MODEL='gemini-3.5-flash';
 
 const numericFields=['count','labelledCount','churnedCount','observedChurnRate','averageAccountLength','internationalPlanCount','voiceMailPlanCount','repeatSupportCount','averageSupportCalls','totalCharges'];
-const departmentNames=['All departments','B2C','B2B','Orange Money','Customer Service','Retention / CRM','Sales','Network','Finance','Executive Management'];
+const departmentNames=['All departments','B2C','B2B','Orange Money','Customer Service','Retention / CRM','Sales','Network','Executive Management'];
 function number(value) {return typeof value==='number'&&Number.isFinite(value)&&value>=0?value:null;}
 export function sanitiseContext(input={}) {
   if(!input||typeof input!=='object')input={};
