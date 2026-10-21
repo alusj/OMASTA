@@ -4,18 +4,14 @@ import SierraLeoneMap, { MapLegend } from './SierraLeoneMap';
 import { METRICS } from './mapScale.mjs';
 import { buildRegionalModel, regionalUpdates, simulateImpact, SEGMENTS, BANDS, MONTHS } from './regional.mjs';
 import { TABS } from './tabs.mjs';
+import { useGeo } from './useGeo';
+import DecisionInsights, { MetricInfo } from './DecisionInsights';
 import './workspace.css';
 
 const fmt = n => Math.round(n).toLocaleString('en-US');
 const pct = (n, d) => d ? `${(n / d * 100).toFixed(1)}%` : '—';
 const cap = s => s[0].toUpperCase() + s.slice(1);
 
-let geoPromise;
-function useGeo() {
-  const [geo, setGeo] = useState(null);
-  useEffect(() => { let live = true; (geoPromise ??= import('./geo/sierraLeone.js').then(m => m.default)).then(g => live && setGeo(g)); return () => { live = false; }; }, []);
-  return geo;
-}
 
 function BandChip({band}) { return <span className="band-chip" style={{'--band':BANDS[band].color}}><i/>{BANDS[band].label}</span>; }
 function Change({value, unit = ' pts'}) {
@@ -46,7 +42,7 @@ function Panel({title, sub, action, children, className = ''}) {
   return <section className={`panel ${className}`}><div className="panel-heading"><div><h2>{title}</h2>{sub && <p>{sub}</p>}</div>{action}</div>{children}</section>;
 }
 
-export default function DepartmentWorkspace({department, tab, onTab, multiplier, onNotice, children}) {
+export default function DepartmentWorkspace({department, tab, onTab, multiplier, periodLabel, assessed, onNotice, children}) {
   const geo = useGeo();
   const [district, setDistrict] = useState(null), [chiefdom, setChiefdom] = useState(null), [metric, setMetric] = useState('rate'), [band, setBand] = useState('all');
   useEffect(() => { setDistrict(null); setChiefdom(null); setBand('all'); }, [department]);
@@ -55,26 +51,27 @@ export default function DepartmentWorkspace({department, tab, onTab, multiplier,
   const openDistrict = id => { selectDistrict(id); onTab('analysis'); };
   const tabs = <nav className="ws-tabs" aria-label="Department sections">{TABS.map(t => <button key={t.key} className={tab === t.key ? 'active' : ''} aria-current={tab === t.key ? 'page' : undefined} onClick={() => onTab(t.key)}><t.Icon size={15}/>{t.label}</button>)}<span className="ws-tabs-note"><ShieldCheck size={12}/>Sample regional data · real district boundaries</span></nav>;
   if (!model) return <>{tabs}<div className="ws-loading"><span/>Loading Sierra Leone map…</div></>;
-  const props = {model, geo, multiplier, district, chiefdom, metric, band, setMetric, setBand, selectDistrict, setChiefdom, openDistrict, onNotice};
+  const props = {model, geo, multiplier, periodLabel, assessed, district, chiefdom, metric, band, setMetric, setBand, selectDistrict, setChiefdom, openDistrict, onNotice};
   return <>{tabs}{tab === 'analysis' ? <AnalysisTab {...props}/> : tab === 'intelligence' ? <IntelligenceTab {...props}/> : <OverviewTab {...props}>{children}</OverviewTab>}</>;
 }
 
-function Metrics({model, multiplier}) {
+function Metrics({model, multiplier, periodLabel}) {
   const {profile, national} = model;
   const cards = [
-    {label:`Total ${profile.unit}`, value:fmt(profile.customers), change:'2.3%', note:'base growth', Icon:Users, color:'orange', good:true},
-    {label:'Customers at risk', value:fmt(national.atRisk * multiplier), change:`${profile.rate}%`, note:'churn rate', Icon:Activity, color:'red'},
-    {label:'At risk of leaving', value:fmt(national.segments.leaving * multiplier), change:pct(national.segments.leaving, profile.customers), note:'act this week', Icon:UserX, color:'purple'},
-    {label:'Revenue at risk', value:`SLE ${(profile.revenue * multiplier).toFixed(1)}M`, change:'14.2%', note:'estimated exposure', Icon:Landmark, color:'green'},
+    {label:`Total ${profile.unit}`, value:fmt(profile.customers), change:'2.3%', note:'base growth', Icon:Users, color:'orange', good:true, info:'Subscribers, accounts or wallets in this business unit (service counts, not unique people).'},
+    {label:'Customers at risk', value:fmt(national.atRisk * multiplier), change:`${profile.rate}%`, note:'churn rate', Icon:Activity, color:'red', info:'Customers in the high-risk and at-risk-of-leaving segments of the regional estimate. The % is the estimated churn rate.'},
+    {label:'At risk of leaving', value:fmt(national.segments.leaving * multiplier), change:pct(national.segments.leaving, profile.customers), note:'act this week', Icon:UserX, color:'purple', info:'The most urgent segment: customers estimated to leave soon without intervention.'},
+    {label:'Revenue at risk', value:`SLE ${(profile.revenue * multiplier).toFixed(1)}M`, change:'14.2%', note:'estimated exposure', Icon:Landmark, color:'green', info:'Monthly revenue from at-risk customers, in SLE millions.'},
   ];
-  return <div className="metrics">{cards.map(m => <section className="metric" key={m.label}><div className="metric-top"><span>{m.label}</span><div className={`metric-icon ${m.color}`}><m.Icon size={19}/></div></div><strong>{m.value}</strong><div className="metric-bottom"><span className={m.good ? 'positive' : 'negative'}><ArrowUpRight size={14}/>{m.change}</span><span>{m.note}</span></div></section>)}</div>;
+  return <div className="metrics">{cards.map(m => <section className="metric" key={m.label}><div className="metric-top"><span>{m.label}<MetricInfo definition={m.info} period={periodLabel} source="Illustrative regional estimate (fictional sample), not model-assessed"/></span><div className={`metric-icon ${m.color}`}><m.Icon size={19}/></div></div><strong>{m.value}</strong><div className="metric-bottom"><span className={m.good ? 'positive' : 'negative'}><ArrowUpRight size={14}/>{m.change}</span><span>{m.note}</span></div></section>)}<p className="metrics-source">Regional estimates for {model.department === 'All departments' ? 'all business units' : model.department} · {periodLabel} · fictional sample, not model-assessed. Model-assessed figures are in the insights below.</p></div>;
 }
 
-function OverviewTab({model, geo, multiplier, openDistrict, children}) {
+function OverviewTab({model, geo, multiplier, periodLabel, assessed, openDistrict, children}) {
   const {profile, national, provinces} = model, updates = regionalUpdates(model);
   const change = national.trend[11] - national.trend[8];
   return <>
-    <Metrics model={model} multiplier={multiplier}/>
+    <Metrics model={model} multiplier={multiplier} periodLabel={periodLabel}/>
+    {assessed && <DecisionInsights key={model.department} {...assessed} department={model.department}/>}
     <div className="ov-grid">
       <div className="ov-main">
         <div className="ov-pair">
@@ -196,11 +193,11 @@ function IntelligenceTab({model, district, selectDistrict, openDistrict, onNotic
   const lows = model.districts.filter(d => d.band === 'low').sort((a, b) => a.rate - b.rate);
   return <>
     <div className="intel-scope">
-      <div><span className="eyebrow"><i/>CHURN INTELLIGENCE</span><h2>{row ? `Why ${profile.unit} leave in ${row.name}` : `Why ${profile.unit} leave Orange ${model.department === 'All departments' ? '' : model.department}`}</h2><p>{profile.focus} Drivers are estimated from sample behavioural signals, not confirmed causes.</p></div>
+      <div><span className="eyebrow"><i/>CHURN INTELLIGENCE</span><h2>{row ? `Signals linked to churn in ${row.name}` : `Signals linked to churn${model.department === 'All departments' ? '' : ` · ${model.department}`}`}</h2><p>{profile.focus} Drivers are estimated from sample behavioural signals, not confirmed causes.</p></div>
       <label className="district-picker"><MapPin size={14}/><select aria-label="Scope churn drivers" value={district ?? ''} onChange={e => selectDistrict(e.target.value || null)}><option value="">National</option>{model.districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
     </div>
     <div className="intel-grid">
-      <Panel title="Churn drivers & solutions" sub={`Share of ${row ? row.name : 'national'} churn cases · click a driver for the playbook`}>
+      <Panel title="Churn signals & recommended responses" sub={`Share of ${row ? row.name : 'national'} churn cases showing each signal (association, not proven cause) · click for the playbook`}>
         <div className="driver-cards">{[...drivers].map((d, i) => ({...d, i})).sort((a, b) => b.share - a.share).map((d, rank) => {
           const saved = churners * d.share / 100 * d.lift, active = open === d.i;
           return <div key={d.label} className={`driver-card ${active ? 'open' : ''}`}>

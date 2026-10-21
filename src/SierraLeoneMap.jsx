@@ -53,7 +53,7 @@ export default function SierraLeoneMap({geo, model, metric = 'rate', band = 'all
         {geo.districts.map(d => {
           const row = rows.get(d.id), active = d.id === selected, dim = (district && !active) || !visibleBand(row);
           return <path key={d.id} d={d.d} className={`sl-district ${active ? 'active' : ''}`} vectorEffect="non-scaling-stroke"
-            fill={district ? (active ? '#fff' : '#e7ecf0') : colourFor(band === 'leaving' ? 'leaving' : metric, row, model.districts, model.profile.rate)}
+            fill={district ? (active ? '#fff' : '#e7ecf0') : !row.customers ? '#eef1f4' : colourFor(band === 'leaving' ? 'leaving' : metric, row, model.districts, model.profile.rate)}
             opacity={dim && !district ? 0.22 : 1} tabIndex={compact ? -1 : 0} role="button" aria-label={`${d.name}: ${row.rate}% churn`}
             onMouseMove={e => moveTip(e, row, 'district')} onClick={() => onSelect?.(active ? null : d.id)}
             onKeyDown={e => e.key === 'Enter' && onSelect?.(active ? null : d.id)}/>;

@@ -6,7 +6,7 @@ export const business = [
 ];
 export const initialUsers = [
   {id:1, name:'Mariama Kamara', initials:'MK', email:'mariama@example.com', role:'Super admin', departments:[...departments]},
-  {id:2, name:'Ibrahim Sesay', initials:'IS', email:'ibrahim@example.com', role:'Department admin', departments:['B2C', 'Sales']},
+  {id:2, name:'Ibrahim Sesay', initials:'IS', email:'ibrahim@example.com', role:'Department admin', departments:['B2C', 'Sales'], canUpload:true},
   {id:3, name:'Fatmata Conteh', initials:'FC', email:'fatmata@example.com', role:'Department admin', departments:['Orange Money']},
   {id:4, name:'Mohamed Bangura', initials:'MB', email:'mohamed@example.com', role:'Department admin', departments:['B2B']},
 ];

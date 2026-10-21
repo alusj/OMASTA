@@ -5,3 +5,7 @@ export function resolveDepartment(user, requested, departments) {
   const allowed = allowedDepartments(user, departments);
   return allowed.includes(requested) ? requested : allowed[0] ?? null;
 }
+// Dataset uploads are limited to super admins and admins explicitly granted upload rights.
+export function canUploadDatasets(user) {
+  return user?.role === 'Super admin' || (user?.canUpload === true && user.departments?.length > 0);
+}

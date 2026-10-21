@@ -13,3 +13,10 @@ test('removed assignments and users without access never expose overview', () =>
   assert.equal(resolveDepartment({role:'Department admin',departments:[]}, 'All departments', ['B2C']), null);
   assert.deepEqual(allowedDepartments({role:'Department admin',departments:['Invalid']}, ['B2C']), []);
 });
+import { canUploadDatasets } from './access.mjs';
+test('only super admins and granted admins can upload datasets', () => {
+  assert.equal(canUploadDatasets({role:'Super admin', departments:[]}), true);
+  assert.equal(canUploadDatasets({role:'Department admin', departments:['B2C'], canUpload:true}), true);
+  assert.equal(canUploadDatasets({role:'Department admin', departments:['B2C']}), false);
+  assert.equal(canUploadDatasets({role:'Department admin', departments:[], canUpload:true}), false);
+});
